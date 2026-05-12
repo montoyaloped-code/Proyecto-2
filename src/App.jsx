@@ -1,19 +1,19 @@
 
 import './App.css'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import PaginaPrincipal from './componets/pagina-principal.jsx'
+import Sedes from './pages/sedes.jsx'
+import Docencia from './pages/docencia.jsx'
 
 export const App = () => {
   return (
-    <>
-    
-
-
-    <h1 className='text-3xl font-bold underline text-center text-blue-500'>
-      Hello worlddddd!
-    </h1>
-    </>
-
-
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<PaginaPrincipal />} />
+        <Route path="/sedes" element={<Sedes />} />
+        <Route path="/docencia" element={<Docencia />} />
+      </Routes>
+    </BrowserRouter>
   )
-
 }
 
