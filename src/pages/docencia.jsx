@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import '../App.css';
 import './sedes-style.css';
 
+
 export default function Docencia() {
   return (
     <div>

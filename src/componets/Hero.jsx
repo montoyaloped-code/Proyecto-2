@@ -1,14 +1,11 @@
+
 import '../App.css';
 
 
 export default function Hero() {
   return (
     <section className="hero" id="inicio">
-      <img
-        src={cancha}
-        alt="Campus Ignacio Yepes"
-        className="hero-bg"
-      />
+      <img className="hero-bg" src="/cancha.jpg" alt="Fondo de la institución" />
       <div className="hero-overlay"></div>
       <div className="hero-content">
         <h1>Bienvenidos a la I.E. Ignacio Yepes Yepes</h1>
@@ -24,8 +21,8 @@ export default function Hero() {
             Plataforma
           </a>
         </div>
-      </div>
       <div className="scroll-indicator"><span></span></div>
+      </div>
     </section>
   );
 }

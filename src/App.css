@@ -51,6 +51,13 @@ a {
   color: inherit;
 }
 
+.logo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -163,13 +170,16 @@ a {
   display: flex;
   gap: 1.5rem;
   list-style: none;
+  align-items: center;
 }
 .nav-links a {
-  color: rgba(250, 246, 240, 0.85);
+  color: rgba(250, 246, 240, 0.95);
   font-size: 0.875rem;
   font-weight: 500;
   transition: color 0.2s;
   position: relative;
+  display: inline-flex;
+  align-items: center;
 }
 .nav-links a::after {
   content: "";
@@ -233,16 +243,23 @@ a {
   justify-content: center;
 }
 
-.escudo :hover {
+.escudo:hover {
   opacity: 0.9;
   transform: scale(1.03);
   transition: all 0.3s;
 }
 
+.escudo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 /* ===== HERO ===== */
 .hero {
   position: relative;
-  min-height: 100vh;
+  min-height: calc(100vh - 64px);
+  padding-top: 4rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -255,7 +272,7 @@ a {
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 .hero-overlay {
   position: absolute;
@@ -265,6 +282,8 @@ a {
     rgba(0, 80, 0, 0.75),
     rgba(0, 100, 0, 0.6)
   );
+  z-index: 0;
+  pointer-events: none;
 }
 .hero-content {
   position: relative;
@@ -286,12 +305,12 @@ a {
 }
 .hero-buttons {
   display: flex;
-  gap: 1rem;
+  gap: 5rem;
   justify-content: center;
   flex-wrap: wrap;
 }
 .scroll-indicator {
-  position: absolute;
+  position: sticky;
   bottom: 2rem;
   left: 50%;
   transform: translateX(-50%);
@@ -303,12 +322,14 @@ a {
   justify-content: center;
   padding-top: 8px;
   animation: bounce 2s infinite;
+  z-index: 0;
 }
 .scroll-indicator span {
   width: 6px;
   height: 12px;
   background: rgba(255, 255, 255, 0.5);
   border-radius: 3px;
+  
 }
 @keyframes bounce {
   0%,
@@ -695,18 +716,41 @@ a {
 /* ===== CONTACTO ===== */
 .contact-grid {
   display: grid;
-  grid-template-columns: minmax(0, 760px);
-  justify-content: left;
+  grid-template-columns: minmax(0, 420px) minmax(320px, 1fr);
+  justify-content: space-between;
   gap: 2rem;
   margin-bottom: 2rem;
 }
-.contact-info {
+.contact-info,
+.contact-map {
   width: 100%;
 }
-.contact-info h3 {
+.contact-info h3,
+.contact-map h3 {
   font-size: 1.5rem;
   color: var(--primary);
   margin-bottom: 1.5rem;
+}
+.contact-map .map-frame {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  margin-bottom: 1rem;
+}
+.contact-map iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.contact-map p {
+  color: var(--muted-fg);
+  font-size: 0.95rem;
+}
+.contact-map a {
+  color: var(--primary);
+  text-decoration: underline;
 }
 .contact-item {
   display: flex;

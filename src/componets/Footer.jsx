@@ -1,4 +1,6 @@
 import '../App.css';
+import { Link } from 'react-router-dom';
+
 
 
 export default function Footer() {
@@ -12,15 +14,16 @@ export default function Footer() {
         <div>
           <h4>Enlaces</h4>
           <div className="footer-links">
-            <a href="/">Inicio</a>
-            <a href="#docencia">Docencia</a>
-            <a href="#sedes">Sedes</a>
-            <a href="#contacto">Contacto</a>
+            <Link to="/">Inicio</Link>
+            <Link to="/docencia">Docencia</Link>
+            <Link to="/#sedes">Sedes</Link>
+            <Link to="/#contacto">Contacto</Link>
           </div>
         </div>
       </div>
-      <div className="footer-bottom">© 2026 I.E. Ignacio Yepes Yepes — Remedios, Antioquia</div>
-      <div className="footer-bottom">Desarrollado por Sergio Andres Montoya Lopez-Desarrollador de Software</div>
+      <div className="footer-bottom">© 2026 I.E. Ignacio Yepes Yepes — Remedios, Antioquia
+        <div></div>
+      Desarrollado por Sergio Andres Montoya Lopez-Desarrollador de Software</div>
     </footer>
   );
 }

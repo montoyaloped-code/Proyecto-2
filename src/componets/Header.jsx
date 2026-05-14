@@ -1,7 +1,7 @@
+import '../App.css';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import '../App.css';
-import ESCUDO from '../componets/ESCUDO.png';
+
 
 
 export default function Header() {
@@ -20,7 +20,7 @@ export default function Header() {
       <div className="navbar-inner container">
         <Link to="/" className="navbar-brand">
           <span className="escudo">
-            <img src={ESCUDO} alt="Escudo I.E. Ignacio Yepes Yepes" />
+            <img className='logo' src="ESCUDO.png" alt="Escudo I.E. Ignacio Yepes Yepes" />
           </span>
           I.E. Ignacio Yepes Yepes
         </Link>
@@ -35,12 +35,13 @@ export default function Header() {
           type="button" 
           onClick={toggleMenu}
           aria-label="Abrir menú"
+          aria-expanded={mobileMenuOpen}
         >
           ☰
         </button>
       </div>
       {mobileMenuOpen && (
-        <div className="mobile-menu" id="mobileMenu">
+        <div className={`mobile-menu ${mobileMenuOpen ? 'open' : ''}`} id="mobileMenu">
           <a href="#nosotros" onClick={closeMenu}>Nosotros</a>
           <Link to="/docencia" onClick={closeMenu}>Docencia</Link>
           <Link to="/sedes" onClick={closeMenu}>Sedes</Link>

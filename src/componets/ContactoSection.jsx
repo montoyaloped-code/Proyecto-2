@@ -32,6 +32,17 @@ export default function ContactoSection() {
               text="inseyepesy@yahoo.es"
             />
           </article>
+          <aside className="contact-map">
+            <h3>Encuéntranos</h3>
+            <div className="map-frame">
+              <iframe
+                title="Mapa I.E. Ignacio Yepes Yepes"
+                src="https://www.openstreetmap.org/export/embed.html?bbox=-74.8141%2C7.1037%2C-74.8041%2C7.1117&layer=mapnik&marker=7.1077%2C-74.8091"
+                loading="lazy"
+              ></iframe>
+            </div>
+            <p>Ver en <a href="https://www.openstreetmap.org/?mlat=7.1077&amp;mlon=-74.8091#map=16/7.1077/-74.8091" target="_blank" rel="noreferrer">OpenStreetMap</a>.</p>
+          </aside>
         </div>
       </div>
     </section>
