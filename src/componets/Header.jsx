@@ -25,10 +25,10 @@ export default function Header() {
           I.E. Ignacio Yepes Yepes
         </Link>
         <nav className="nav-links">
-          <a href="#nosotros">Nosotros</a>
+          <a href="/nosotros">Nosotros</a>
           <Link to="/docencia">Docencia</Link>
           <Link to="/sedes">Sedes</Link>
-          <a href="#contacto">Contacto</a>
+          <a href="/contacto">Contacto</a>
         </nav>
         <button 
           className="hamburger" 

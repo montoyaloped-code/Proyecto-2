@@ -13,19 +13,17 @@ export default function Hero() {
         <h1>Bienvenidos a la I.E. Ignacio Yepes Yepes</h1>
         <p className="font-bold!">Educando con excelencia y valores en Remedios, Antioquia.</p>
         <div className="hero-buttons">
-          <a href="#nosotros" className="btn-primary">
-            Conócenos
-          </a>
+          
           <div className="scroll-indicator">
             <span></span>
           </div>
           <a
-            href="http://162.216.241.106/server20/wc.dll?seguridad~login"
+            href="#nosotros"
             className="btn-outline"
-            target="_blank"
-            rel="noreferrer"
+            
+        
           >
-            Plataforma
+            Conocenos
           </a>
         </div>
       </div>

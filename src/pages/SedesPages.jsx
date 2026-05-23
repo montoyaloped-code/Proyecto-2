@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../App.css';
-import './sedes-style.css';
+import '../sedes-style.css';
+
+
 
 const sedesData = [
   {
@@ -161,23 +163,7 @@ export default function Sedes() {
 
   if (currentSede) {
     return (
-      <div>
-        <header className="nav">
-          <div className="nav-inner">
-            <Link to="/" className="brand">
-              <span className="escudo">
-                <img src="ESCUDO.png" alt="ESCUDO" />
-              </span>
-              <span>I.E. Ignacio Yepes Yepes</span>
-            </Link>
-            <button
-              className="chip active"
-              onClick={() => setSelectedSede(null)}
-            >
-              Volver a sedes
-            </button>
-          </div>
-        </header>
+      <div> 
 
         <main>
           <section className="hero">
@@ -260,18 +246,6 @@ export default function Sedes() {
 
   return (
     <div>
-      <header className="nav">
-        <div className="nav-inner">
-          <Link to="/" className="brand">
-            <span className="escudo">
-              <img src="ESCUDO.png" alt="ESCUDO" />
-            </span>
-            <span>I.E. Ignacio Yepes Yepes</span>
-          </Link>
-          <Link to="/" className="chip active">Volver al inicio</Link>
-        </div>
-      </header>
-
       <main id="view-list">
         <section className="section" id="sedes">
           <div className="container">
@@ -332,9 +306,6 @@ export default function Sedes() {
         </section>
       </main>
 
-      <footer>
-        © I.E. Ignacio Yepes Yepes — Remedios, Antioquia
-      </footer>
     </div>
   );
 }

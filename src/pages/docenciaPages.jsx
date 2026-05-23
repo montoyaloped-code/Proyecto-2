@@ -1,20 +1,10 @@
 import { Link } from 'react-router-dom';
 import '../App.css';
-import './sedes-style.css';
+import '../sedes-style.css';
 
 
-export default function Docencia() {
+export default function DocenciaPages() {
   return (
-    <div>
-      <header className="nav">
-        <div className="nav-inner">
-          <Link to="/" className="brand">
-            <span className="escudo"><img src="ESCUDO.png" alt="ESCUDO" /></span>
-            <span>I.E. Ignacio Yepes Yepes</span>
-          </Link>
-          <Link to="/" className="chip active">Volver al inicio</Link>
-        </div>
-      </header>
 
       <main>
         <section className="section">
@@ -84,11 +74,5 @@ export default function Docencia() {
         </section>
       </main>
 
-      <footer>
-        © I.E. Ignacio Yepes Yepes — Remedios, Antioquia
-        <br />
-        Página desarrollada por Sergio Andres Montoya Lopez - Desarrollador de Software
-      </footer>
-    </div>
   );
 }
