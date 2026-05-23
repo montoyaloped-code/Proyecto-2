@@ -14,10 +14,10 @@ export default function Footer() {
         <div>
           <h4>Enlaces</h4>
           <div className="footer-links">
-            <Link to="/">Inicio</Link>
+            <Link to="/Inicio">Inicio</Link>
             <Link to="/docencia">Docencia</Link>
-            <Link to="/#sedes">Sedes</Link>
-            <Link to="/#contacto">Contacto</Link>
+            <Link to="/sedes">Sedes</Link>
+            <Link to="/contacto">Contacto</Link>
           </div>
         </div>
       </div>
