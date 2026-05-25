@@ -2,8 +2,6 @@ import '../App.css';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-
-
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -18,18 +16,24 @@ export default function Header() {
   return (
     <header className="navbar">
       <div className="navbar-inner container">
-        <Link to="/" className="navbar-brand">
+        <Link to="/" className="navbar-brand" onClick={closeMenu}>
           <span className="escudo">
             <img className='logo' src="ESCUDO.png" alt="Escudo I.E. Ignacio Yepes Yepes" />
           </span>
           I.E. Ignacio Yepes Yepes
         </Link>
+        
         <nav className="nav-links">
-          <a href="/nosotros">Nosotros</a>
+          <Link to="/">Inicio</Link>
+          <a href="/#nosotros">Nosotros</a>
           <Link to="/docencia">Docencia</Link>
           <Link to="/sedes">Sedes</Link>
-          <a href="/contacto">Contacto</a>
+          <Link to="/bienestar">Bienestar</Link>
+          <Link to="/portal-academico">Portal Académico</Link>
+          <Link to="/atencion-ciudadana">Atención Ciudadana</Link>
+          <a href="/#contacto">Contacto</a>
         </nav>
+        
         <button 
           className="hamburger" 
           type="button" 
@@ -40,12 +44,17 @@ export default function Header() {
           ☰
         </button>
       </div>
+      
       {mobileMenuOpen && (
-        <div className={`mobile-menu ${mobileMenuOpen ? 'open' : ''}`} id="mobileMenu">
-          <a href="#nosotros" onClick={closeMenu}>Nosotros</a>
+        <div className={`mobile-menu ${mobileMenuOpen ? 'open' : ''}`} id="mobileMenu" style={{ padding: '2rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <Link to="/" onClick={closeMenu}>Inicio</Link>
+          <a href="/#nosotros" onClick={closeMenu}>Nosotros</a>
           <Link to="/docencia" onClick={closeMenu}>Docencia</Link>
           <Link to="/sedes" onClick={closeMenu}>Sedes</Link>
-          <a href="#contacto" onClick={closeMenu}>Contacto</a>
+          <Link to="/bienestar" onClick={closeMenu}>Bienestar Psicológico</Link>
+          <Link to="/portal-academico" onClick={closeMenu}>Portal Académico</Link>
+          <Link to="/atencion-ciudadana" onClick={closeMenu}>Atención Ciudadana</Link>
+          <a href="/#contacto" onClick={closeMenu}>Contacto</a>
         </div>
       )}
     </header>
