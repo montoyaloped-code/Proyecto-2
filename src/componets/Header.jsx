@@ -31,6 +31,7 @@ export default function Header() {
           <Link to="/bienestar">Bienestar</Link>
           <Link to="/portal-academico">Portal Académico</Link>
           <Link to="/atencion-ciudadana">Atención Ciudadana</Link>
+          <Link to="/HistoriaSimbolos">Historia</Link>
           <a href="/#contacto">Contacto</a>
         </nav>
         

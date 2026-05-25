@@ -1,5 +1,7 @@
 import '../App.css';
 import { OfertaCard } from './Card';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function OfertaSection() {
   return (
@@ -29,6 +31,9 @@ export default function OfertaSection() {
             title="Educación para Adultos"
             description="Jornada nocturna y sabatino (CLEI) para jóvenes y adultos mayores de 14 años."
           />
+        </div>
+        <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+          <Link to="/docencia" className="btn-primary">Nuestro equipo docente</Link>
         </div>
       </div>
     </section>

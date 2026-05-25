@@ -12,6 +12,8 @@ import Footer from './componets/Footer.jsx'
 import PsicologiaPages from './pages/PsicologiaPages.jsx'
 import PortalAcademicoPages from './pages/PortalAcademicoPages.jsx'
 import AtencionCiudadanaPages from './pages/AtencionCiudadanaPages.jsx'
+import HistoriaSection from './componets/HistoriaSection.jsx'
+import HistoriaSimbolosPages from './pages/HistoriaSimbolosPages.jsx'
 
 export const App = () => {
   return (
@@ -28,6 +30,7 @@ export const App = () => {
         <Route path="/bienestar" element={<PsicologiaPages />} />
         <Route path="/portal-academico" element={<PortalAcademicoPages />} />
         <Route path="/atencion-ciudadana" element={<AtencionCiudadanaPages />} />
+        <Route path="/HistoriaSimbolos" element={<HistoriaSimbolosPages />} />
       </Routes>
       <Footer />
     </BrowserRouter>
