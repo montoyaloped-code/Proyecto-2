@@ -1,4 +1,5 @@
 import '../App.css';
+import { Link } from 'react-router-dom';
 
 export default function HistoriaSection() {
   const timelineEvents = [
@@ -40,7 +41,7 @@ export default function HistoriaSection() {
   ];
 
   return (
-    <section className="section-padding" style={{ background: 'rgba(240, 244, 239, 0.9)' }}>
+    <section className="section-padding" style={{ background: 'var(--background)' }}>
       <div className="container">
         <h2 className="section-title">Nuestra Historia</h2>
         <p className="section-subtitle">Más de seis décadas formando a la juventud de Remedios.</p>
@@ -53,7 +54,11 @@ export default function HistoriaSection() {
               <h3>{event.title}</h3>
               <p>{event.description}</p>
             </article>
+            
           ))}
+          <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+          <Link to="/HistoriaSimbolos" className="btn-primary">Ver mas detalles</Link>
+        </div>
         </div>
       </div>
     </section>

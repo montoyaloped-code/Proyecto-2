@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import '../App.css'; // Import global styles
 
 export default function AdminPanel() {
-  const [activeTab, setActiveTab] = useState('docentes'); // 'docentes', 'galeria', 'cuadro-honor', 'constitucion'
+  const [activeTab, setActiveTab] = useState('directivos'); // 'directivos', 'docentes', 'galeria', 'cuadro-honor', 'constitucion'
 
   // --- Docentes State & Logic ---
   const [docentes, setDocentes] = useState(() => {
@@ -150,6 +150,42 @@ export default function AdminPanel() {
     }
   };
 
+  // --- Directivos State & Logic ---
+  const [directivos, setDirectivos] = useState(() => {
+    const stored = localStorage.getItem('listaDirectivos');
+    return stored ? JSON.parse(stored) : [];
+  });
+  const [nombreDirectivo, setNombreDirectivo] = useState('');
+  const [cargoDirectivo, setCargoDirectivo] = useState('');
+  const [editingDirectivoIndex, setEditingDirectivoIndex] = useState(null);
+
+  const CARGOS_DIRECTIVOS = ["Rector", "Coordinador Académico", "Coordinador de Convivencia", "Secretario(a)"];
+
+  useEffect(() => {
+    localStorage.setItem('listaDirectivos', JSON.stringify(directivos));
+  }, [directivos]);
+
+  const handleDirectivoSubmit = (e) => {
+    e.preventDefault();
+    if (!nombreDirectivo.trim() || !cargoDirectivo) return alert("Por favor, completa el nombre y selecciona un cargo.");
+
+    if (editingDirectivoIndex !== null) {
+      const copia = [...directivos];
+      copia[editingDirectivoIndex] = { nombre: nombreDirectivo.trim(), cargo: cargoDirectivo };
+      setDirectivos(copia);
+      setEditingDirectivoIndex(null);
+    } else {
+      setDirectivos([...directivos, { nombre: nombreDirectivo.trim(), cargo: cargoDirectivo }]);
+    }
+    setNombreDirectivo(''); setCargoDirectivo('');
+  };
+
+  const deleteDirectivo = (idx) => {
+    if (window.confirm('¿Estás seguro de que quieres eliminar a este directivo?')) {
+      setDirectivos(directivos.filter((_, i) => i !== idx));
+    }
+  };
+
   return (
     <main className="container" style={{ padding: '4rem 1rem', minHeight: '80vh' }}>
       <div className="section-head" style={{ textAlign: 'center', marginBottom: '3rem' }}>
@@ -162,6 +198,12 @@ export default function AdminPanel() {
 
       {/* Navegación por pestañas */}
       <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', borderBottom: '2px solid #e2e8f0', marginBottom: '3rem' }}>
+        <button
+          onClick={() => setActiveTab('directivos')}
+          style={{ paddingBottom: '1rem', background: 'none', border: 'none', fontSize: '1.125rem', fontWeight: '600', cursor: 'pointer', color: activeTab === 'directivos' ? 'var(--primary)' : 'var(--muted-fg)', borderBottom: activeTab === 'directivos' ? '4px solid var(--primary)' : '4px solid transparent', transition: 'all 0.2s' }}
+        >
+          🏛️ Directivos
+        </button>
         <button
           onClick={() => setActiveTab('docentes')}
           style={{ paddingBottom: '1rem', background: 'none', border: 'none', fontSize: '1.125rem', fontWeight: '600', cursor: 'pointer', color: activeTab === 'docentes' ? 'var(--primary)' : 'var(--muted-fg)', borderBottom: activeTab === 'docentes' ? '4px solid var(--primary)' : '4px solid transparent', transition: 'all 0.2s' }}
@@ -189,6 +231,50 @@ export default function AdminPanel() {
       </div>
 
       {/* Contenido de la pestaña activa */}
+      {activeTab === 'directivos' && (
+        <section>
+          <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1.5rem', color: 'var(--primary)' }}>Gestión de Directivos</h3>
+          <form onSubmit={handleDirectivoSubmit} className="card" style={{ padding: '2.5rem 2rem', marginBottom: '3rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <div>
+              <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.4rem' }}>Nombre Completo</label>
+              <input type="text" required style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: '#fff', fontSize: '0.95rem' }} value={nombreDirectivo} onChange={e => setNombreDirectivo(e.target.value)} />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.4rem' }}>Cargo</label>
+              <select value={cargoDirectivo} onChange={e => setCargoDirectivo(e.target.value)} required style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: '#fff' }}>
+                <option value="">Seleccionar cargo...</option>
+                {CARGOS_DIRECTIVOS.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <button type="submit" className="btn" style={{ background: 'var(--primary)', color: 'white', padding: '0.85rem' }}>
+              {editingDirectivoIndex !== null ? 'Guardar Cambios' : 'Registrar Directivo'}
+            </button>
+          </form>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
+            {directivos.map((d, idx) => (
+              <div key={idx} className="card" style={{ padding: '1.5rem' }}>
+                <h4 style={{ color: 'var(--primary)', margin: 0 }}>{d.nombre}</h4>
+                <p style={{ fontSize: '0.85rem', color: 'var(--accent)', fontWeight: 'bold' }}>{d.cargo}</p>
+                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+                  <button 
+                    onClick={() => {
+                      setEditingDirectivoIndex(idx);
+                      setNombreDirectivo(d.nombre);
+                      setCargoDirectivo(d.cargo);
+                    }} 
+                    className="btn" 
+                    style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}
+                  >
+                    Editar
+                  </button>
+                  <button onClick={() => deleteDirectivo(idx)} className="btn" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', background: 'var(--destructive)' }}>Eliminar</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {activeTab === 'docentes' && (
         <section>
           <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1.5rem', color: 'var(--primary)' }}>Gestión de Docentes</h3>

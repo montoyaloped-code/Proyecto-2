@@ -12,10 +12,14 @@ export default function DocenciaPages() {
   const [materiaHover, setMateriaHover] = useState(null);
 
   const [docentes, setDocentes] = useState([]);
+  const [directivos, setDirectivos] = useState([]);
 
   useEffect(() => {
-    const stored = localStorage.getItem('listaDocentes');
-    if (stored) setDocentes(JSON.parse(stored));
+    const storedDocentes = localStorage.getItem('listaDocentes');
+    if (storedDocentes) setDocentes(JSON.parse(storedDocentes));
+    
+    const storedDirectivos = localStorage.getItem('listaDirectivos');
+    if (storedDirectivos) setDirectivos(JSON.parse(storedDirectivos));
   }, []);
 
   const AREAS_INICIALES = [
@@ -57,6 +61,11 @@ export default function DocenciaPages() {
     }
   ];
 
+  // Estadísticas dinámicas basadas en los datos administrados
+  const totalDocentes = docentes.length > 0 ? docentes.length : 89;
+  const totalCoordinadores = directivos.filter(d => d.cargo.toLowerCase().includes('coordinador')).length || 3;
+  const totalRectores = directivos.filter(d => d.cargo.toLowerCase() === 'rector').length || 1;
+
   // Función para alternar la apertura de una card
   const toggleMateria = (index) => {
     if (materiaAbierta === index) {
@@ -68,7 +77,7 @@ export default function DocenciaPages() {
 
   return (
     <main>
-      <section className="section" style={{ background: '#f8fafc', padding: '4rem 0' }}>
+      <section className="section" style={{ background: 'var(--background)', padding: '4rem 0' }}>
         <div className="container" style={{ maxWidth: '1000px', margin: '0 auto' }}>
           
           {/* Módulo de Inducción */}
@@ -81,7 +90,7 @@ export default function DocenciaPages() {
             <span className="eyebrow">Planta de Personal</span>
             <h2>Equipo Docente</h2>
             <div className='divider'></div>
-            <p style={{ maxWidth: '700px', margin: '0 auto', color: '#475569' }}>
+            <p style={{ maxWidth: '700px', margin: '0 auto', color: 'var(--muted-text)' }}>
               La I.E. Ignacio Yepes Yepes cuenta con 89 educadores, 3 coordinadores y 1 rector, vinculados al Sistema General de Participaciones de la Nación.
             </p>
           </div>
@@ -94,28 +103,28 @@ export default function DocenciaPages() {
             marginTop: '2.5rem',
             marginBottom: '4rem'
           }}>
-            <div className="card" style={{ textAlign: 'center', background: '#fff' }}>
+            <div className="card" style={{ textAlign: 'center', background: 'var(--card)' }}>
               <div className="card-body" style={{ padding: '24px' }}>
-                <h3 style={{ fontSize: '2.5rem', color: '#057a55', margin: 0 }}>89</h3>
-                <p style={{ color: '#64748b', fontWeight: '500', margin: '8px 0 0 0' }}>Docentes activos</p>
+                <h3 style={{ fontSize: '2.5rem', color: '#057a55', margin: 0 }}>{totalDocentes}</h3>
+                <p style={{ color: 'var(--muted-text)', fontWeight: '500', margin: '8px 0 0 0' }}>Docentes activos</p>
               </div>
             </div>
-            <div className="card" style={{ textAlign: 'center', background: '#fff' }}>
+            <div className="card" style={{ textAlign: 'center', background: 'var(--card)' }}>
               <div className="card-body" style={{ padding: '24px' }}>
-                <h3 style={{ fontSize: '2.5rem', color: '#057a55', margin: 0 }}>3</h3>
-                <p style={{ color: '#64748b', fontWeight: '500', margin: '8px 0 0 0' }}>Coordinadores</p>
+                <h3 style={{ fontSize: '2.5rem', color: '#057a55', margin: 0 }}>{totalCoordinadores}</h3>
+                <p style={{ color: 'var(--muted-text)', fontWeight: '500', margin: '8px 0 0 0' }}>Coordinadores</p>
               </div>
             </div>
-            <div className="card" style={{ textAlign: 'center', background: '#fff' }}>
+            <div className="card" style={{ textAlign: 'center', background: 'var(--card)' }}>
               <div className="card-body" style={{ padding: '24px' }}>
-                <h3 style={{ fontSize: '2.5rem', color: '#057a55', margin: 0 }}>1</h3>
-                <p style={{ color: '#64748b', fontWeight: '500', margin: '8px 0 0 0' }}>Rector</p>
+                <h3 style={{ fontSize: '2.5rem', color: '#057a55', margin: 0 }}>{totalRectores}</h3>
+                <p style={{ color: 'var(--muted-text)', fontWeight: '500', margin: '8px 0 0 0' }}>Rector</p>
               </div>
             </div>
-            <div className="card" style={{ textAlign: 'center', background: '#fff' }}>
+            <div className="card" style={{ textAlign: 'center', background: 'var(--card)' }}>
               <div className="card-body" style={{ padding: '24px' }}>
                 <h3 style={{ fontSize: '2.5rem', color: '#057a55', margin: 0 }}>3.000+</h3>
-                <p style={{ color: '#64748b', fontWeight: '500', margin: '8px 0 0 0' }}>Estudiantes atendidos</p>
+                <p style={{ color: 'var(--muted-text)', fontWeight: '500', margin: '8px 0 0 0' }}>Estudiantes atendidos</p>
               </div>
             </div>
           </div>
@@ -125,20 +134,32 @@ export default function DocenciaPages() {
             <h2>Directivos</h2>
             <div className='divider'></div>
           </div>
-          <div className="card" style={{ marginTop: '1rem', padding: '32px', background: '#fff', marginBottom: '4rem' }}>
+        
+        {directivos.length > 0 ? (
+          <div className="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', marginBottom: '4rem' }}>
+            {directivos.map((dir, idx) => (
+              <div key={idx} className="card" style={{ padding: '24px', textAlign: 'center' }}>
+                <h3 style={{ color: 'var(--primary)', marginBottom: '0.5rem' }}>{dir.nombre}</h3>
+                <p style={{ fontWeight: 'bold', color: 'var(--accent)', textTransform: 'uppercase', fontSize: '0.9rem' }}>{dir.cargo}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="card" style={{ marginTop: '1rem', padding: '32px', background: 'var(--card)', marginBottom: '4rem' }}>
             <div className="card-body">
-              <h3 style={{ color: '#1e293b', marginBottom: '0.5rem' }}>Rectoría Histórica</h3>
-              <p style={{ color: '#475569', lineHeight: '1.6' }}>
-                El cargo de rector ha sido ocupado históricamente por figuras como Jesús Orlando Valencia Díaz. Para conocer el estado del nombramiento actual o decretos vigentes, consultar directamente con la secretaría del plantel.
+              <h3 style={{ color: 'var(--foreground)', marginBottom: '0.5rem' }}>Equipo Directivo</h3>
+              <p style={{ color: 'var(--muted-text)', lineHeight: '1.6' }}>
+                Consulta directamente con la secretaría del plantel para conocer el equipo directivo vigente y los decretos de nombramiento.
               </p>
             </div>
           </div>
+        )}
 
          {/* Sección Áreas Académicas - Cards con Hover Animado y Despliegue */}
 <div className="section-head" style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
   <h2>Áreas Académicas</h2>
   <div className='divider'></div>
-  <p style={{ color: '#64748b', fontSize: '0.95rem', marginTop: '0.5rem' }}>
+  <p style={{ color: 'var(--muted-text)', fontSize: '0.95rem', marginTop: '0.5rem' }}>
     Haz clic sobre cualquier área para desplegar su enfoque educativo.
   </p>
 </div>
@@ -162,13 +183,13 @@ export default function DocenciaPages() {
         onMouseEnter={() => setMateriaHover(index)}
         onMouseLeave={() => setMateriaHover(null)}
         style={{ 
-          background: '#fff', 
+          background: 'var(--card)', 
           cursor: 'pointer', 
           // LA MAGIA DE LA ANIMACIÓN: Transición suave para el borde, la sombra y el movimiento
           transition: 'all 0.25s ease-in-out',
           
           // Borde elegante: Si tiene hover o está abierta, se ilumina con el verde primary (#057a55)
-          border: tieneHover || esActiva ? '1px solid #057a55' : '1px solid #e2e8f0',
+          border: tieneHover || esActiva ? '1px solid #057a55' : '1px solid var(--border)',
           borderLeft: esActiva ? '5px solid #057a55' : tieneHover ? '5px solid #057a55' : '1px solid #e2e8f0',
           
           // Efecto de elevación: Si tiene hover, la tarjeta se levanta sutilmente (-3px) y gana sombra
@@ -183,7 +204,7 @@ export default function DocenciaPages() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h4 style={{ 
               margin: 0, 
-              color: esActiva || tieneHover ? '#057a55' : '#1e293b', 
+              color: esActiva || tieneHover ? '#057a55' : 'var(--foreground)', 
               fontSize: '1.1rem', 
               fontWeight: '600',
               transition: 'color 0.2s ease'
@@ -206,10 +227,10 @@ export default function DocenciaPages() {
             <div style={{ 
               marginTop: '12px', 
               paddingTop: '12px', 
-              borderTop: '1px solid #f1f5f9',
+              borderTop: '1px solid var(--border)',
               animation: 'fadeIn 0.3s ease' 
             }}>
-              <p style={{ color: '#475569', fontSize: '0.95rem', lineHeight: '1.5', margin: 0 }}>
+              <p style={{ color: 'var(--muted-text)', fontSize: '0.95rem', lineHeight: '1.5', margin: 0 }}>
                 {materia.descripcion}
               </p>
             </div>
@@ -232,7 +253,7 @@ export default function DocenciaPages() {
                 <div key={idx} className="card" style={{ padding: '20px', textAlign: 'center' }}>
                   <h4 style={{ color: 'var(--primary)', marginBottom: '5px' }}>{d.nombre}</h4>
                   <p style={{ fontSize: '0.85rem', fontWeight: 'bold', color: 'var(--accent)', textTransform: 'uppercase' }}>{d.area}</p>
-                  <p style={{ fontSize: '0.9rem', color: '#64748b' }}>{d.cargo}</p>
+                  <p style={{ fontSize: '0.9rem', color: 'var(--muted-text)' }}>{d.cargo}</p>
                 </div>
               ))}
             </div>

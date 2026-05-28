@@ -252,6 +252,7 @@ export default function Sedes() {
             <div className="section-head">
               <span className="eyebrow">Nuestras sedes</span>
               <h2>11 sedes al servicio de Colombia</h2>
+              <div className='divider'></div>
               <p>
                 Una red educativa urbana y rural comprometida con la formación
                 integral de niños, niñas y jóvenes del municipio.

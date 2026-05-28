@@ -84,32 +84,7 @@ function App() {
 
 
 
-        {/* =========================================================================
-           CONTENEDOR FLOTANTE DE REDES SOCIALES
-           ========================================================================= */}
-        <div className="social-floating-container">
-          
-          {/* BOTÓN DE FACEBOOK (Cambia el '#' por el link real de la página del colegio) */}
-          <a 
-            href="https://www.facebook.com/p/IE-Ignacio-Yepes-Yepes-100029264331780/?locale=es_LA" 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            className="social-floating-btn facebook"
-            aria-label="Seguir en Facebook"
-          >
-            {/* SVG del logo oficial de Facebook */}
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M9 8H7v3h2v9h3v-9h2.725l.415-3H12V6.625c0-.854.184-1.395 1.4-1.395H15V2h-2.814C9.776 2 9 3.538 9 5.762V8z"/>
-            </svg>
-          </a>
-
-          {/* Siguiente red social (Por si en el futuro quieres meter más, solo descomentas abajo) */}
-          {/* <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="social-floating-btn instagram">
-            ... SVG de Instagram ...
-          </a> 
-          */}
-
-        </div>
+        
 
       </BrowserRouter>
     </div>

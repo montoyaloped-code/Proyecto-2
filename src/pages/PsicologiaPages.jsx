@@ -71,7 +71,7 @@ export default function PsicologiaPages() {
               marginTop: activeCard === tema.id ? '1rem' : '0',
               opacity: activeCard === tema.id ? 1 : 0
             }}>
-              <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1rem', color: 'var(--foreground)', fontSize: '0.92rem', lineHeight: '1.6' }}>
+              <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1rem', color: 'var(--muted-text)', fontSize: '0.92rem', lineHeight: '1.6' }}>
                 {tema.details}
               </div>
             </div>

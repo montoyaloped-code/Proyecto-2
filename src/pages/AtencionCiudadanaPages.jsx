@@ -2,7 +2,13 @@ import { useState } from 'react';
 import '../App.css';
 
 export default function AtencionCiudadanaPages() {
-  const [formState, setFormState] = useState({ nombre: '', correo: '', tipo: 'Sugerencia', mensaje: '' });
+  const [formState, setFormState] = useState({
+    nombre: '',
+    correo: '',
+    tipo: 'Sugerencia',
+    mensaje: ''
+  });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -11,29 +17,31 @@ export default function AtencionCiudadanaPages() {
     setIsSubmitting(true);
 
     const { nombre, correo, tipo, mensaje } = formState;
-    const recipientEmail = 'MontoyaLoped@gmail.com'; // Correo al que se enviará
     
-    const subject = encodeURIComponent(`PQRS - ${tipo} de ${nombre}`);
+    const recipientEmail = 'MontoyaLoped@gmail.com';
+    const subject = `PQRS - ${tipo} de ${nombre}`;
     const bodyText = `Nombre: ${nombre}\nCorreo: ${correo}\nTipo: ${tipo}\n\nMensaje:\n${mensaje}`;
-    const body = encodeURIComponent(bodyText);
 
-    const mailtoUrl = `mailto:${recipientEmail}?subject=${subject}&body=${body}`;
+    const mailtoUrl = `mailto:${recipientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyText)}`;
 
     try {
-      // Usar location.href es el método más fiable para protocolos mailto:
       window.location.href = mailtoUrl;
-      // Informar al usuario que debe enviar el correo desde su cliente
-      alert('Tu cliente de correo se abrirá con el mensaje prellenado. Por favor, haz clic en "Enviar" en tu programa de correo para completar la solicitud.');
+      
+      // Feedback más claro
+      setTimeout(() => {
+        alert('✅ Se ha abierto tu cliente de correo con la información prellenada.\n\nPor favor, revisa los datos y haz clic en "Enviar".');
+      }, 300);
+
     } catch (error) {
-      console.error("Error al intentar abrir el cliente de correo:", error);
-      alert('No se pudo abrir tu cliente de correo automáticamente. Por favor, envía un correo a MontoyaLoped@gmail.com con los detalles de tu solicitud.');
+      alert('No se pudo abrir el cliente de correo. Por favor envía tu mensaje manualmente a: MontoyaLoped@gmail.com');
     }
 
-    // Simular el feedback de envío (aunque el usuario aún debe enviar el correo manualmente)
+    // Feedback visual
     setIsSubmitting(false);
     setSubmitted(true);
-    setFormState({ nombre: '', correo: '', tipo: 'Sugerencia', mensaje: '' }); // Limpiar el formulario
-    setTimeout(() => setSubmitted(false), 5000); // Ocultar el mensaje de éxito después de 5 segundos
+    setFormState({ nombre: '', correo: '', tipo: 'Sugerencia', mensaje: '' });
+
+    setTimeout(() => setSubmitted(false), 6000);
   };
 
   const documentos = [
@@ -48,6 +56,7 @@ export default function AtencionCiudadanaPages() {
       <div className="section-head" style={{ textAlign: 'center', marginBottom: '3rem' }}>
         <span className="eyebrow" style={{ color: 'var(--accent)' }}>Canales de Atención</span>
         <h2 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)' }}>Atención Ciudadana</h2>
+        <div className='divider'></div>
         <p style={{ maxWidth: '600px', margin: '1rem auto 0' }}>
           Cumplimos con la normatividad de transparencia ciudadana de Colombia. Envía tus solicitudes o descarga documentación legal oficial.
         </p>
@@ -61,42 +70,24 @@ export default function AtencionCiudadanaPages() {
             Buzón Virtual de PQRS
           </h3>
           <p style={{ fontSize: '0.9rem', color: 'var(--muted-fg)', marginBottom: '1.5rem' }}>
-            Envía tus Peticiones, Quejas, Reclamos o Sugerencias directamente a la mesa administrativa central de la secretaría general.
+            Envía tus Peticiones, Quejas, Reclamos o Sugerencias directamente a la mesa administrativa.
           </p>
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            {/* ... (mantengo tus campos iguales) */}
             <div>
               <label htmlFor="nombre-pqrs" style={{ display: 'block', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '0.4rem', color: 'var(--foreground)' }}>Nombre completo</label>
-              <input 
-                type="text" 
-                id="nombre-pqrs"
-                required
-                style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: '#fff', fontSize: '0.95rem' }}
-                value={formState.nombre}
-                onChange={e => setFormState({...formState, nombre: e.target.value})}
-              />
+              <input type="text" id="nombre-pqrs" required style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: '#fff', fontSize: '0.95rem' }} value={formState.nombre} onChange={e => setFormState({...formState, nombre: e.target.value})} />
             </div>
 
             <div>
               <label htmlFor="correo-pqrs" style={{ display: 'block', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '0.4rem', color: 'var(--foreground)' }}>Correo electrónico</label>
-              <input 
-                type="email" 
-                id="correo-pqrs"
-                required
-                style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: '#fff', fontSize: '0.95rem' }}
-                value={formState.correo}
-                onChange={e => setFormState({...formState, correo: e.target.value})}
-              />
+              <input type="email" id="correo-pqrs" required style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: '#fff', fontSize: '0.95rem' }} value={formState.correo} onChange={e => setFormState({...formState, correo: e.target.value})} />
             </div>
 
             <div>
               <label htmlFor="tipo-pqrs" style={{ display: 'block', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '0.4rem', color: 'var(--foreground)' }}>Tipo de radicación</label>
-              <select 
-                id="tipo-pqrs"
-                style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: '#fff', fontSize: '0.95rem' }}
-                value={formState.tipo}
-                onChange={e => setFormState({...formState, tipo: e.target.value})}
-              >
+              <select id="tipo-pqrs" style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: '#fff', fontSize: '0.95rem' }} value={formState.tipo} onChange={e => setFormState({...formState, tipo: e.target.value})}>
                 <option value="Sugerencia">💡 Sugerencia</option>
                 <option value="Petición">📝 Petición (Derecho de Petición)</option>
                 <option value="Queja">⚠️ Queja institucional</option>
@@ -106,28 +97,16 @@ export default function AtencionCiudadanaPages() {
 
             <div>
               <label htmlFor="mensaje-pqrs" style={{ display: 'block', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '0.4rem', color: 'var(--foreground)' }}>Mensaje o descripción</label>
-              <textarea 
-                rows="4" 
-                id="mensaje-pqrs"
-                required
-                style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: '#fff', fontSize: '0.95rem', resize: 'vertical' }}
-                value={formState.mensaje}
-                onChange={e => setFormState({...formState, mensaje: e.target.value})}
-              ></textarea>
+              <textarea rows="4" id="mensaje-pqrs" required style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: '#fff', fontSize: '0.95rem', resize: 'vertical' }} value={formState.mensaje} onChange={e => setFormState({...formState, mensaje: e.target.value})}></textarea>
             </div>
 
-            <button 
-              type="submit" 
-              disabled={isSubmitting}
-              className="btn" 
-              style={{ width: '100%', padding: '0.85rem', background: 'var(--primary)', color: 'var(--primary-fg)', fontWeight: 'bold', border: 'none', cursor: 'pointer' }}
-            >
-              {isSubmitting ? "Enviando radicado..." : "Enviar Solicitud Institucional"}
+            <button type="submit" disabled={isSubmitting} className="btn" style={{ width: '100%', padding: '0.85rem', background: 'var(--primary)', color: 'var(--primary-fg)', fontWeight: 'bold', border: 'none', cursor: 'pointer' }}>
+              {isSubmitting ? "Preparando mensaje..." : "Enviar Solicitud Institucional"}
             </button>
 
             {submitted && (
               <div role="alert" style={{ background: '#e6f4ea', border: '1px solid #137333', color: '#137333', padding: '1rem', borderRadius: '0.5rem', fontSize: '0.9rem', textAlign: 'center', marginTop: '0.5rem', fontWeight: 'bold' }}>
-                ✓ ¡Solicitud procesada con éxito! Radicado enviado a rectoría.
+                ✓ ¡Solicitud preparada! Revisa tu cliente de correo y envíala.
               </div>
             )}
           </form>

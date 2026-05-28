@@ -3,7 +3,7 @@ import { ContactCard } from './Card';
 
 export default function ContactoSection() {
   return (
-    <section id="contacto" className="section-padding" style={{ background: 'rgba(240, 244, 239, 0.9)' }}>
+    <section id="contacto" className="section-padding" style={{ background: 'var(--background)' }}>
       <div className="container">
         <h2 className="section-title">Contacto</h2>
         <p className="section-subtitle">Estamos aquí para atenderte.</p>

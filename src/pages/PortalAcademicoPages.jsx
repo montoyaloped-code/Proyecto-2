@@ -59,9 +59,9 @@ export default function PortalAcademicoPages() {
           <span className="timeline-dot" style={{ background: 'var(--accent)' }}></span>
           <span className="timeline-year" style={{ background: 'rgba(201,149,43,0.1)', color: 'var(--accent)' }}>02</span>
           <h3>Contraseña por Defecto</h3>
-          <div style={{ background: 'var(--card)', borderLeft: '4px solid var(--accent)', padding: '1.25rem', borderRadius: '0 0.5rem 0.5rem 0', margin: '0.5rem 0' }}>
+          <div style={{ background: 'var(--muted)', borderLeft: '4px solid var(--accent)', padding: '1.25rem', borderRadius: '0 0.5rem 0.5rem 0', margin: '0.5rem 0' }}>
             <p style={{ margin: 0, fontWeight: 'bold', color: 'var(--foreground)' }}>
-              ⚠️ ATENCIÓN: La clave inicial obligatoria para todos los alumnos en la plataforma es estrictamente la palabra <span style={{ color: 'var(--primary)', fontSize: '1.15rem', background: '#fff', padding: '2px 8px', borderRadius: '4px', border: '1px solid var(--border)' }}>yepes</span> (en minúsculas y sin espacios).
+              ⚠️ ATENCIÓN: La clave inicial obligatoria para todos los alumnos en la plataforma es estrictamente la palabra <span style={{ color: 'var(--primary)', fontSize: '1.15rem', background: 'var(--card)', padding: '2px 8px', borderRadius: '4px', border: '1px solid var(--border)' }}>yepes</span> (en minúsculas y sin espacios).
             </p>
           </div>
         </article>
