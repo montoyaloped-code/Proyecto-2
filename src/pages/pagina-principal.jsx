@@ -1,12 +1,11 @@
-import Hero from '../componets/Hero';
-import NosotrosSection from '../componets/NosotrosSection';
-import SedesSection from '../componets/SedesSection';
-import OfertaSection from '../componets/OfertaSection';
-import HimnoSection from '../componets/HimnoSection';
-import HistoriaSection from '../componets/HistoriaSection';
-import GaleriaSection from '../componets/GaleriaSection';
-import ContactoSection from '../componets/ContactoSection';
-import Footer from '../componets/Footer';
+import Hero from '../components/Hero';
+import NosotrosSection from '../components/NosotrosSection';
+import SedesSection from '../components/SedesSection';
+import OfertaSection from '../components/OfertaSection';
+import HimnoSection from '../components/HimnoSection';
+import HistoriaSection from '../components/HistoriaSection';
+import GaleriaSection from '../components/GaleriaSection';
+import ContactoSection from '../components/ContactoSection';
 
 export default function PaginaPrincipal() {
   return (

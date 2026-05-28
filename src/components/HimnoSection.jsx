@@ -62,6 +62,7 @@ export default function HimnoSection() {
             <div style={{ fontSize: '3.5rem' }}>🎵</div>
             <button
               onClick={playAudio}
+              aria-label={isPlaying ? 'Pausar himno' : 'Reproducir himno'}
               style={{
                 position: 'absolute',
                 top: '50%',

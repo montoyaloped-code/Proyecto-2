@@ -2,7 +2,8 @@ import '../App.css';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-export default function Header() {
+// Recibimos las propiedades desde App.jsx desestructurándolas en los parámetros
+export default function Header({ darkMode, setDarkMode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -11,6 +12,11 @@ export default function Header() {
 
   const closeMenu = () => {
     setMobileMenuOpen(false);
+  };
+
+  // Función para alternar el estado del modo oscuro
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
   };
 
   return (
@@ -23,7 +29,7 @@ export default function Header() {
           I.E. Ignacio Yepes Yepes
         </Link>
         
-        <nav className="nav-links">
+        <nav className="nav-links" aria-label="Navegación principal">
           <Link to="/">Inicio</Link>
           <a href="/#nosotros">Nosotros</a>
           <Link to="/docencia">Docencia</Link>
@@ -32,7 +38,19 @@ export default function Header() {
           <Link to="/portal-academico">Portal Académico</Link>
           <Link to="/atencion-ciudadana">Atención Ciudadana</Link>
           <Link to="/HistoriaSimbolos">Historia</Link>
-          <a href="/#contacto">Contacto</a>
+          <Link to="/horas-constitucionales">Constitución</Link>
+          <Link to="/cuadro-de-honor">Honor</Link>
+          <Link to="/admin" className="admin-link">Admin</Link>
+
+          {/* BOTÓN MODO OSCURO (ESCRITORIO) */}
+          <button 
+            onClick={toggleDarkMode} 
+            className="dark-mode-toggle"
+            type="button"
+            aria-label="Cambiar modo de color"
+          >
+            {darkMode ? '☀️' : '🌙'}
+          </button>
         </nav>
         
         <button 
@@ -40,14 +58,17 @@ export default function Header() {
           type="button" 
           onClick={toggleMenu}
           aria-label="Abrir menú"
+          aria-controls="mobile-menu-container"
           aria-expanded={mobileMenuOpen}
         >
-          ☰
+          {mobileMenuOpen ? '✕' : '☰'}
         </button>
       </div>
       
-      {mobileMenuOpen && (
-        <div className={`mobile-menu ${mobileMenuOpen ? 'open' : ''}`} id="mobileMenu" style={{ padding: '2rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+      <div 
+        id="mobile-menu-container"
+        className={`mobile-menu ${mobileMenuOpen ? 'open' : ''}`}
+      >
           <Link to="/" onClick={closeMenu}>Inicio</Link>
           <a href="/#nosotros" onClick={closeMenu}>Nosotros</a>
           <Link to="/docencia" onClick={closeMenu}>Docencia</Link>
@@ -55,9 +76,19 @@ export default function Header() {
           <Link to="/bienestar" onClick={closeMenu}>Bienestar Psicológico</Link>
           <Link to="/portal-academico" onClick={closeMenu}>Portal Académico</Link>
           <Link to="/atencion-ciudadana" onClick={closeMenu}>Atención Ciudadana</Link>
-          <a href="/#contacto" onClick={closeMenu}>Contacto</a>
+          <Link to="/cuadro-de-honor" onClick={closeMenu}>Cuadro de Honor</Link> {/* Nuevo enlace */}
+          <Link to="/horas-constitucionales" onClick={closeMenu}>Horas Constitucionales</Link>
+          <Link to="/admin" onClick={closeMenu} className="admin-link">Admin Panel</Link>
+
+          {/* BOTÓN MODO OSCURO (MÓVIL) */}
+          <button 
+            onClick={() => { toggleDarkMode(); closeMenu(); }} 
+            className="dark-mode-toggle-mobile"
+            type="button"
+          >
+            {darkMode ? '☀️ Modo Claro' : '🌙 Modo Oscuro'}
+          </button>
         </div>
-      )}
     </header>
   );
 }

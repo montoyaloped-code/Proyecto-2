@@ -415,3 +415,36 @@ footer {
   margin-top: 40px;
   background: var(--surface);
 }
+
+
+/* ==========================================================================
+   PARCHE AISLADO PARA LA PÁGINA DE SEDES
+   ========================================================================== */
+body.dark {
+  background: #091a0c !important;
+  color: #f0fdf4 !important;
+}
+
+/* Cambia las tarjetas de la sección sedes */
+body.dark .card {
+  background: #112915 !important;
+  border-color: #23472a !important;
+}
+
+/* Ajusta los textos dentro de la tarjeta de sedes */
+body.dark .card-body h3,
+body.dark .section-head h2 {
+  color: #f0fdf4 !important;
+}
+
+body.dark .section-head p,
+body.dark .meta,
+body.dark .detail-grid p {
+  color: #a7bfae !important;
+}
+
+/* Si usas la barra lateral (aside) en el detalle de la sede */
+body.dark aside.side {
+  background: #112915 !important;
+  border-color: #23472a !important;
+}

@@ -31,7 +31,7 @@ export default function PortalAcademicoPages() {
           Accede al sistema del PC Académico oficial para verificar boletines periódicos, hojas de vida estudiantiles e historiales de asistencia.
         </p>
         <a 
-          href="https://www.pcacademico.com" 
+          href="http://162.216.241.106/server7/wc.dll?seguridad~login" 
           target="_blank" 
           rel="noopener noreferrer" 
           className="btn"

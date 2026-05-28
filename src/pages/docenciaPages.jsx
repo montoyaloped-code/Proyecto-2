@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import '../App.css';
 import '../sedes-style.css';
-import ModuloInduccion from '../componets/ModuloInduccion';
+import ModuloInduccion from '../components/ModuloInduccion';
 
 export default function DocenciaPages() {
   // Estado para controlar qué card de materia está expandida (guarda el índice)
@@ -11,8 +11,14 @@ export default function DocenciaPages() {
   // Estado para controlar a qué tarjeta se le está haciendo hover (guarda el índice)
   const [materiaHover, setMateriaHover] = useState(null);
 
-  // Información detallada de cada área académica para el despliegue
-  const areasAcademicas = [
+  const [docentes, setDocentes] = useState([]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('listaDocentes');
+    if (stored) setDocentes(JSON.parse(stored));
+  }, []);
+
+  const AREAS_INICIALES = [
     {
       nombre: "Ciencias Naturales",
       descripcion: "Exploración del entorno vivo, físico y químico. Enfoque en la preservación ambiental, la biodiversidad del territorio de Remedios y el desarrollo del pensamiento científico básico."
@@ -129,7 +135,7 @@ export default function DocenciaPages() {
           </div>
 
          {/* Sección Áreas Académicas - Cards con Hover Animado y Despliegue */}
-<div className="section-head" style={{ textAlign: 'left', marginBottom: '1.5rem' }}>
+<div className="section-head" style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
   <h2>Áreas Académicas</h2>
   <div className='divider'></div>
   <p style={{ color: '#64748b', fontSize: '0.95rem', marginTop: '0.5rem' }}>
@@ -143,7 +149,7 @@ export default function DocenciaPages() {
   gap: '20px',
   marginBottom: '4rem' 
 }}>
-  {areasAcademicas.map((materia, index) => {
+  {AREAS_INICIALES.map((materia, index) => {
     // Validamos si esta card específica tiene el hover o está expandida
     const esActiva = materiaAbierta === index;
     const tieneHover = materiaHover === index;
@@ -213,6 +219,25 @@ export default function DocenciaPages() {
     );
   })}
 </div>
+
+        {/* Sección de Directorio Docente Dinámico */}
+        {docentes.length > 0 && (
+          <div style={{ marginTop: '4rem' }}>
+            <div className="section-head" style={{ textAlign: 'center', marginBottom: '2rem' }}>
+              <h2>Listado de Docentes</h2>
+              <div className='divider'></div>
+            </div>
+            <div className="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
+              {docentes.map((d, idx) => (
+                <div key={idx} className="card" style={{ padding: '20px', textAlign: 'center' }}>
+                  <h4 style={{ color: 'var(--primary)', marginBottom: '5px' }}>{d.nombre}</h4>
+                  <p style={{ fontSize: '0.85rem', fontWeight: 'bold', color: 'var(--accent)', textTransform: 'uppercase' }}>{d.area}</p>
+                  <p style={{ fontSize: '0.9rem', color: '#64748b' }}>{d.cargo}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         </div>
       </section>
     </main>

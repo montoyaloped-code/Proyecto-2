@@ -9,12 +9,31 @@ export default function AtencionCiudadanaPages() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setSubmitted(true);
-      setFormState({ nombre: '', correo: '', tipo: 'Sugerencia', mensaje: '' });
-      setTimeout(() => setSubmitted(false), 5000);
-    }, 1500);
+
+    const { nombre, correo, tipo, mensaje } = formState;
+    const recipientEmail = 'MontoyaLoped@gmail.com'; // Correo al que se enviará
+    
+    const subject = encodeURIComponent(`PQRS - ${tipo} de ${nombre}`);
+    const bodyText = `Nombre: ${nombre}\nCorreo: ${correo}\nTipo: ${tipo}\n\nMensaje:\n${mensaje}`;
+    const body = encodeURIComponent(bodyText);
+
+    const mailtoUrl = `mailto:${recipientEmail}?subject=${subject}&body=${body}`;
+
+    try {
+      // Usar location.href es el método más fiable para protocolos mailto:
+      window.location.href = mailtoUrl;
+      // Informar al usuario que debe enviar el correo desde su cliente
+      alert('Tu cliente de correo se abrirá con el mensaje prellenado. Por favor, haz clic en "Enviar" en tu programa de correo para completar la solicitud.');
+    } catch (error) {
+      console.error("Error al intentar abrir el cliente de correo:", error);
+      alert('No se pudo abrir tu cliente de correo automáticamente. Por favor, envía un correo a MontoyaLoped@gmail.com con los detalles de tu solicitud.');
+    }
+
+    // Simular el feedback de envío (aunque el usuario aún debe enviar el correo manualmente)
+    setIsSubmitting(false);
+    setSubmitted(true);
+    setFormState({ nombre: '', correo: '', tipo: 'Sugerencia', mensaje: '' }); // Limpiar el formulario
+    setTimeout(() => setSubmitted(false), 5000); // Ocultar el mensaje de éxito después de 5 segundos
   };
 
   const documentos = [
@@ -47,9 +66,10 @@ export default function AtencionCiudadanaPages() {
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '0.4rem', color: 'var(--foreground)' }}>Nombre completo</label>
+              <label htmlFor="nombre-pqrs" style={{ display: 'block', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '0.4rem', color: 'var(--foreground)' }}>Nombre completo</label>
               <input 
                 type="text" 
+                id="nombre-pqrs"
                 required
                 style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: '#fff', fontSize: '0.95rem' }}
                 value={formState.nombre}
@@ -58,9 +78,10 @@ export default function AtencionCiudadanaPages() {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '0.4rem', color: 'var(--foreground)' }}>Correo electrónico</label>
+              <label htmlFor="correo-pqrs" style={{ display: 'block', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '0.4rem', color: 'var(--foreground)' }}>Correo electrónico</label>
               <input 
                 type="email" 
+                id="correo-pqrs"
                 required
                 style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: '#fff', fontSize: '0.95rem' }}
                 value={formState.correo}
@@ -69,8 +90,9 @@ export default function AtencionCiudadanaPages() {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '0.4rem', color: 'var(--foreground)' }}>Tipo de radicación</label>
+              <label htmlFor="tipo-pqrs" style={{ display: 'block', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '0.4rem', color: 'var(--foreground)' }}>Tipo de radicación</label>
               <select 
+                id="tipo-pqrs"
                 style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: '#fff', fontSize: '0.95rem' }}
                 value={formState.tipo}
                 onChange={e => setFormState({...formState, tipo: e.target.value})}
@@ -83,9 +105,10 @@ export default function AtencionCiudadanaPages() {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '0.4rem', color: 'var(--foreground)' }}>Mensaje o descripción</label>
+              <label htmlFor="mensaje-pqrs" style={{ display: 'block', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '0.4rem', color: 'var(--foreground)' }}>Mensaje o descripción</label>
               <textarea 
                 rows="4" 
+                id="mensaje-pqrs"
                 required
                 style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: '#fff', fontSize: '0.95rem', resize: 'vertical' }}
                 value={formState.mensaje}
@@ -103,7 +126,7 @@ export default function AtencionCiudadanaPages() {
             </button>
 
             {submitted && (
-              <div style={{ background: '#e6f4ea', border: '1px solid #137333', color: '#137333', padding: '1rem', borderRadius: '0.5rem', fontSize: '0.9rem', textAlign: 'center', marginTop: '0.5rem', fontWeight: 'bold' }}>
+              <div role="alert" style={{ background: '#e6f4ea', border: '1px solid #137333', color: '#137333', padding: '1rem', borderRadius: '0.5rem', fontSize: '0.9rem', textAlign: 'center', marginTop: '0.5rem', fontWeight: 'bold' }}>
                 ✓ ¡Solicitud procesada con éxito! Radicado enviado a rectoría.
               </div>
             )}

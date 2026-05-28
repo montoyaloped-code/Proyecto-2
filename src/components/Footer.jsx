@@ -19,6 +19,7 @@ export default function Footer() {
             <Link to="/bienestar">Bienestar Emocional</Link>
             <Link to="/portal-academico">Portal Académico</Link>
             <Link to="/atencion-ciudadana">Atención y Transparencia</Link>
+            <Link to="/horas-constitucionales">Horas Constitucionales</Link>
           </div>
         </div>
       </div>

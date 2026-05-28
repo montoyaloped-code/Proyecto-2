@@ -58,21 +58,25 @@ export default function HistoriaSimbolosPages() {
         
         {/* Encabezado */}
         <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-          <span style={{ fontSize: '0.875rem', fontWeight: '600', textTransform: 'uppercase', tracking: '0.1em', color: '#057a55', backgroundColor: '#e6f4ea', padding: '6px 16px', borderRadius: '9999px' }}>
+          <span style={{ fontSize: '0.875rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#057a55', backgroundColor: '#e6f4ea', padding: '6px 16px', borderRadius: '9999px' }}>
             Identidad Institucional
           </span>
-          <h1 style={{ marginTop: '1.5rem', fontSize: '2.5rem', fontWeight: '800', color: '#1e293b' }}>
+          <h1 style={{ marginTop: '1.5rem', fontSize: '2.5rem', fontWeight: '800', color: 'var(--primary)' }}>
             Historia y Símbolos
           </h1>
-          <p style={{ marginTop: '1rem', fontSize: '1.125rem', color: '#64748b', maxWidth: '700px', margin: '1rem auto 0' }}>
+          <div className='divider'></div>
+          <p style={{ marginTop: '1rem', fontSize: '1.125rem', color: 'var(--muted)', maxWidth: '700px', margin: '1rem auto 0' }}>
             Conoce las raíces, las transformaciones históricas y los emblemas oficiales que forjan el espíritu de la I.E. Ignacio Yepes Yepes.
           </p>
         </div>
 
         {/* Menú de pestañas */}
-        <div style={{ display: 'flex', justifyCenter: 'center', justifyContent: 'center', gap: '1.5rem', borderBottom: '2px solid #e2e8f0', marginBottom: '3rem' }}>
+        <div role="tablist" style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', borderBottom: '2px solid #e2e8f0', marginBottom: '3rem' }}>
           <button
             onClick={() => setTabActiva('historia')}
+            role="tab"
+            aria-selected={tabActiva === 'historia'}
+            aria-controls="panel-historia"
             style={{
               paddingBottom: '1rem',
               paddingHorizontal: '1rem',
@@ -91,6 +95,9 @@ export default function HistoriaSimbolosPages() {
           </button>
           <button
             onClick={() => setTabActiva('simbolos')}
+            role="tab"
+            aria-selected={tabActiva === 'simbolos'}
+            aria-controls="panel-simbolos"
             style={{
               paddingBottom: '1rem',
               paddingHorizontal: '1rem',
@@ -111,7 +118,8 @@ export default function HistoriaSimbolosPages() {
 
         {/* CONTENIDO 1: RESEÑA HISTÓRICA (Línea de tiempo usando tus tarjetas) */}
         {tabActiva === 'historia' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          <div id="panel-historia" role="tabpanel" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            <img src="Fundador.jpeg" alt="Fundador del yepes" style={{ width: '50%', maxWidth: '180px', height: 'auto', display: 'block', margin: '0 auto', border: "150px"}} />
             <div className="card" style={{ padding: '24px' }}>
               <p style={{ color: '#475569', lineHeight: '1.7', margin: 0 }}>
                 El desarrollo de nuestro pueblo está basado profundamente en la educación, de ahí tantas luchas y batallas para que en nuestro municipio existiera un lugar digno en donde albergar a una población deseosa de adquirir conocimiento.
@@ -145,9 +153,9 @@ export default function HistoriaSimbolosPages() {
 
         {/* CONTENIDO 2: SÍMBOLOS INSTITUCIONALES */}
         {tabActiva === 'simbolos' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+          <div id="panel-simbolos" role="tabpanel" style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
             
-            {/* El Escudo */}
+            <img src="ESCUDO.png" alt="Escudo de la institución" style={{ width: '50%', maxWidth: '180px', height: 'auto', display: 'block', margin: '0 auto', border: "150px" }} />
             <div className="card" style={{ padding: '28px' }}>
               <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
                 <span style={{ fontSize: '0.85rem', fontWeight: '700', textTransform: 'uppercase', color: '#057a55', letterSpacing: '0.05em' }}>Identidad Visual</span>
@@ -169,13 +177,13 @@ export default function HistoriaSimbolosPages() {
               </div>
             </div>
 
-            {/* La Bandera */}
+            <img src="Bandera.jpeg" alt="Bandera de la institución" style={{ width: '50%', maxWidth: '180px', height: 'auto', display: 'block', margin: '0 auto', border: "150px" }} />
             <div className="card" style={{ padding: '28px' }}>
               <h2 style={{ color: '#1e293b', marginTop: 0, marginBottom: '0.5rem', textAlign: 'center' }}>La Bandera</h2>
               <p style={{ color: '#475569', textTransform: 'none', textAlign: 'center', fontSize: '0.95rem', color: '#64748b' }}>
                 DISEÑADA POR: Licenciado Juan Fernando Álvarez A., educador de la institución.
               </p>
-              <div style={{ borderLeft: '4px solid #057a55', paddingLeft: '1rem', margin: '1.5rem 0', backgroundColor: '#f0fdf4', py: '0.5rem', padding: '12px' }}>
+              <div style={{ borderLeft: '4px solid #057a55', paddingLeft: '1rem', margin: '1.5rem 0', backgroundColor: '#f0fdf4', padding: '12px' }}>
                 <p style={{ color: '#166534', fontStyle: 'italic', margin: 0, lineHeight: '1.6' }}>
                   "Está conformada por un solo fondo de color verde, con el escudo de la institución en el centro. Simboliza el color de la esperanza de todos sus miembros en un futuro lleno de sabiduría, y convoca al amor y respeto a la patria, la constitución y las leyes."
                 </p>
@@ -184,7 +192,7 @@ export default function HistoriaSimbolosPages() {
 
             {/* El Lema */}
             <div className="card" style={{ padding: '32px', textAlign: 'center', backgroundColor: '#1e293b', color: 'white' }}>
-              <span style={{ color: '#10b981', fontWeight: '700', fontSize: '0.85rem', uppercase: 'true', tracking: '0.1em' }}>LEMA INSTITUTIONAL</span>
+              <span style={{ color: '#10b981', fontWeight: '700', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>LEMA INSTITUTIONAL</span>
               <p style={{ fontSize: '1.75rem', fontStyle: 'italic', fontWeight: '700', margin: '0.75rem 0', color: 'white' }}>
                 "Dios y amor de Patria. Con fidelidad mientras se viva."
               </p>
