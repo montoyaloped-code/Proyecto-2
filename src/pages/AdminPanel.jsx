@@ -418,7 +418,7 @@ export default function AdminPanel() {
   });
 
   const [sedeForm, setSedeForm] = useState({
-    name: '', tipo: 'Urbana', location: '', students: '', img: '', desc: '', salones: '', cancha: false, informatica: false, extras: '', gallery: ''
+    name: '', tipo: 'Urbana', location: '', students: '', img: '', desc: '', salones: '', cancha: false, informatica: false, extras: ''
   });
   const [editingSedeIndex, setEditingSedeIndex] = useState(null);
 
@@ -440,9 +440,8 @@ export default function AdminPanel() {
         salones: parseInt(sedeForm.salones),
         cancha: sedeForm.cancha,
         informatica: sedeForm.informatica,
-        extras: sedeForm.extras.split(',').map(ex => ex.trim()).filter(ex => ex !== ""),
-      },
-      gallery: sedeForm.gallery.split(',').map(url => url.trim()).filter(url => url !== "")
+        extras: sedeForm.extras.split(',').map(ex => ex.trim()).filter(ex => ex !== "")
+      }
     };
 
     if (editingSedeIndex !== null) {
@@ -453,7 +452,7 @@ export default function AdminPanel() {
     }
     
     setEditingSedeIndex(null);
-    setSedeForm({ name: '', tipo: 'Urbana', location: '', students: '', img: '', desc: '', salones: '', cancha: false, informatica: false, extras: '', gallery: '' });
+    setSedeForm({ name: '', tipo: 'Urbana', location: '', students: '', img: '', desc: '', salones: '', cancha: false, informatica: false, extras: '' });
   };
 
   return (
@@ -725,10 +724,6 @@ export default function AdminPanel() {
               <label><input type="checkbox" checked={sedeForm.informatica} onChange={e => setSedeForm({...sedeForm, informatica: e.target.checked})} /> Informática</label>
             </div>
             <input type="text" placeholder="Extras (separados por coma: Biblioteca, Comedor, etc.)" style={{ padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)' }} value={sedeForm.extras} onChange={e => setSedeForm({...sedeForm, extras: e.target.value})} />
-            <div>
-              <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.4rem' }}>Galería de la Sede (URLs separadas por coma)</label>
-              <textarea placeholder="https://url1.jpg, https://url2.jpg..." rows="2" style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)' }} value={sedeForm.gallery} onChange={e => setSedeForm({...sedeForm, gallery: e.target.value})}></textarea>
-            </div>
             <button type="submit" className="btn" style={{ background: 'var(--primary)', color: 'white' }}>
               Guardar Cambios en la Sede
             </button>
@@ -750,8 +745,7 @@ export default function AdminPanel() {
                     setSedeForm({
                       name: s.name, tipo: s.tipo, location: s.location, students: s.students, img: s.img,
                       desc: s.description ? s.description[0] : '', salones: s.infra.salones, cancha: s.infra.cancha,
-                      informatica: s.infra.informatica, extras: s.infra.extras ? s.infra.extras.join(', ') : '',
-                      gallery: s.gallery ? s.gallery.join(', ') : ''
+                      informatica: s.infra.informatica, extras: s.infra.extras ? s.infra.extras.join(', ') : ''
                     });
                   }} className="btn" style={{ padding: '0.6rem', fontSize: '0.9rem', width: '100%', background: 'var(--primary)', color: 'white' }}>Gestionar Contenido</button>
                 </div>
