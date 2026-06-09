@@ -140,6 +140,16 @@ a {
   transform: translateY(-4px);
 }
 
+.featured-card {
+  background-color: var(--primary) !important;
+  color: var(--primary-fg) !important;
+  border: none !important;
+}
+
+.featured-card h3, .featured-card p {
+  color: inherit !important;
+}
+
 /* ===== NAVBAR ===== */
 .navbar {
   position: fixed;
@@ -628,7 +638,7 @@ a {
   margin-bottom: 0.35rem;
 }
 .himno-stanza p {
-  color: rgba(250, 246, 240, 0.85);
+  color: inherit;
   line-height: 1.7;
 }
 @media (max-width: 768px) {
@@ -912,8 +922,20 @@ body.dark {
   --muted-fg: #cbd5e1;
   --muted-text: #cbd5e1;
   --border: #1a3a20;
+  --primary: #4ade80;
+  --accent: #fbbf24;
   background-color: var(--background) !important;
   color: var(--foreground) !important;
+}
+
+/* Evita que secciones grandes usen el verde neón como fondo en modo oscuro */
+body.dark .himno-section,
+body.dark .footer,
+body.dark .featured-card {
+  background-color: var(--card) !important;
+  color: var(--foreground) !important;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 /* Fuerza el cambio de fondo de las tarjetas sin romper su padding o sombras */
@@ -930,25 +952,41 @@ body.dark .navbar {
 }
 
 /* Mejora drástica de la visibilidad de párrafos y textos secundarios */
-body.dark p, 
-body.dark span:not(.btn-primary, .admin-link), 
+body.dark p,
 body.dark .section-subtitle, 
-body.dark .muted-fg, 
-body.dark .timeline-item p, 
-body.dark .value-card p, 
-body.dark .oferta-card p, 
+body.dark .muted-fg,
+body.dark .timeline-item p,
+body.dark .value-card p,
+body.dark .oferta-card p,
 body.dark .sedes-card p,
-body.dark .about-text p {
+body.dark .himno-stanza p,
+body.dark .featured-card p {
   color: var(--muted-text) !important;
   opacity: 1 !important;
 }
 
-body.dark h1, body.dark h2, body.dark h3, body.dark h4 {
-  color: #f8fafc !important;
+body.dark .warning-box {
+  background-color: rgba(251, 191, 36, 0.15) !important; /* Fondo ámbar sutil para modo oscuro */
+}
+body.dark .warning-box p {
+  color: var(--foreground) !important; /* Texto blanco para máxima legibilidad */
+}
+body.dark .warning-box span {
+  border-color: var(--primary) !important; /* Resalta el borde de la contraseña 'yepes' */
 }
 
-body.dark .section-title {
-  color: #4ade80 !important; /* Un verde más brillante para títulos en fondo oscuro */
+body.dark .featured-card p {
+  color: var(--foreground) !important;
+}
+
+/* Color de acento para etiquetas en secciones oscuras */
+body.dark .himno-stanza .label {
+  color: var(--accent) !important;
+}
+
+body.dark h1, body.dark h2, body.dark h3, body.dark h4, 
+body.dark .navbar-brand {
+  color: #f8fafc !important;
 }
 
 body.dark .divider {

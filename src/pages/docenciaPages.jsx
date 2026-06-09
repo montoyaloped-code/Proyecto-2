@@ -105,25 +105,25 @@ export default function DocenciaPages() {
           }}>
             <div className="card" style={{ textAlign: 'center', background: 'var(--card)' }}>
               <div className="card-body" style={{ padding: '24px' }}>
-                <h3 style={{ fontSize: '2.5rem', color: '#057a55', margin: 0 }}>{totalDocentes}</h3>
+                <h3 style={{ fontSize: '2.5rem', color: 'var(--primary)', margin: 0 }}>{totalDocentes}</h3>
                 <p style={{ color: 'var(--muted-text)', fontWeight: '500', margin: '8px 0 0 0' }}>Docentes activos</p>
               </div>
             </div>
             <div className="card" style={{ textAlign: 'center', background: 'var(--card)' }}>
               <div className="card-body" style={{ padding: '24px' }}>
-                <h3 style={{ fontSize: '2.5rem', color: '#057a55', margin: 0 }}>{totalCoordinadores}</h3>
+                <h3 style={{ fontSize: '2.5rem', color: 'var(--primary)', margin: 0 }}>{totalCoordinadores}</h3>
                 <p style={{ color: 'var(--muted-text)', fontWeight: '500', margin: '8px 0 0 0' }}>Coordinadores</p>
               </div>
             </div>
             <div className="card" style={{ textAlign: 'center', background: 'var(--card)' }}>
               <div className="card-body" style={{ padding: '24px' }}>
-                <h3 style={{ fontSize: '2.5rem', color: '#057a55', margin: 0 }}>{totalRectores}</h3>
+                <h3 style={{ fontSize: '2.5rem', color: 'var(--primary)', margin: 0 }}>{totalRectores}</h3>
                 <p style={{ color: 'var(--muted-text)', fontWeight: '500', margin: '8px 0 0 0' }}>Rector</p>
               </div>
             </div>
             <div className="card" style={{ textAlign: 'center', background: 'var(--card)' }}>
               <div className="card-body" style={{ padding: '24px' }}>
-                <h3 style={{ fontSize: '2.5rem', color: '#057a55', margin: 0 }}>3.000+</h3>
+                <h3 style={{ fontSize: '2.5rem', color: 'var(--primary)', margin: 0 }}>3.000+</h3>
                 <p style={{ color: 'var(--muted-text)', fontWeight: '500', margin: '8px 0 0 0' }}>Estudiantes atendidos</p>
               </div>
             </div>
@@ -188,9 +188,9 @@ export default function DocenciaPages() {
           // LA MAGIA DE LA ANIMACIÓN: Transición suave para el borde, la sombra y el movimiento
           transition: 'all 0.25s ease-in-out',
           
-          // Borde elegante: Si tiene hover o está abierta, se ilumina con el verde primary (#057a55)
-          border: tieneHover || esActiva ? '1px solid #057a55' : '1px solid var(--border)',
-          borderLeft: esActiva ? '5px solid #057a55' : tieneHover ? '5px solid #057a55' : '1px solid #e2e8f0',
+          // Borde elegante: Si tiene hover o está abierta, se ilumina con el verde primary
+          border: tieneHover || esActiva ? '1px solid var(--primary)' : '1px solid var(--border)',
+          borderLeft: esActiva ? '5px solid var(--primary)' : tieneHover ? '5px solid var(--primary)' : '1px solid var(--border)',
           
           // Efecto de elevación: Si tiene hover, la tarjeta se levanta sutilmente (-3px) y gana sombra
           transform: tieneHover ? 'translateY(-3px)' : 'translateY(0)',
@@ -204,7 +204,7 @@ export default function DocenciaPages() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h4 style={{ 
               margin: 0, 
-              color: esActiva || tieneHover ? '#057a55' : 'var(--foreground)', 
+              color: esActiva || tieneHover ? 'var(--primary)' : 'var(--foreground)', 
               fontSize: '1.1rem', 
               fontWeight: '600',
               transition: 'color 0.2s ease'
@@ -213,7 +213,7 @@ export default function DocenciaPages() {
             </h4>
             <span style={{ 
               fontSize: '1.2rem', 
-              color: esActiva || tieneHover ? '#057a55' : '#94a3b8',
+              color: esActiva || tieneHover ? 'var(--primary)' : 'var(--muted-text)',
               transform: esActiva ? 'rotate(180deg)' : 'rotate(0deg)',
               transition: 'all 0.2s ease',
               lineHeight: '1'
@@ -251,6 +251,15 @@ export default function DocenciaPages() {
             <div className="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
               {docentes.map((d, idx) => (
                 <div key={idx} className="card" style={{ padding: '20px', textAlign: 'center' }}>
+                  {d.foto && (
+                    <img 
+                      src={d.foto} 
+                      alt={d.nombre} 
+                      style={{ 
+                        width: '120px', height: '120px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 1.25rem', border: '4px solid var(--primary)', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' 
+                      }} 
+                    />
+                  )}
                   <h4 style={{ color: 'var(--primary)', marginBottom: '5px' }}>{d.nombre}</h4>
                   <p style={{ fontSize: '0.85rem', fontWeight: 'bold', color: 'var(--accent)', textTransform: 'uppercase' }}>{d.area}</p>
                   <p style={{ fontSize: '0.9rem', color: 'var(--muted-text)' }}>{d.cargo}</p>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import '../App.css';
 
 export default function AtencionCiudadanaPages() {
@@ -44,12 +44,23 @@ export default function AtencionCiudadanaPages() {
     setTimeout(() => setSubmitted(false), 6000);
   };
 
-  const documentos = [
+  const DOCUMENTOS_ESTATICOS = [
     { name: "Directorio Institucional de Funcionarios 2026", size: "142 KB" },
     { name: "Presupuesto General de Rentas y Gastos Autorizado", size: "310 KB" },
     { name: "Resoluciones del Rector e Informes de Gestión Directiva", size: "1.2 MB" },
     { name: "Rendición de Cuentas Anual y Ejecución Presupuestal", size: "845 KB" }
   ];
+
+  const [documentos, setDocumentos] = useState([]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('transparenciaDocs');
+    if (stored && JSON.parse(stored).length > 0) {
+      setDocumentos(JSON.parse(stored));
+    } else {
+      setDocumentos(DOCUMENTOS_ESTATICOS);
+    }
+  }, []);
 
   return (
     <main className="container" style={{ padding: '4rem 1rem', minHeight: '80vh' }}>
@@ -134,12 +145,18 @@ export default function AtencionCiudadanaPages() {
                   <h4 style={{ fontSize: '0.98rem', margin: 0, color: 'var(--foreground)' }}>{doc.name}</h4>
                   <span style={{ fontSize: '0.8rem', color: 'var(--muted-fg)' }}>Formato: PDF · Tamaño: {doc.size}</span>
                 </div>
-                <button 
-                  onClick={() => alert(`Descargando de manera simulada: ${doc.name}`)}
-                  style={{ background: 'rgba(201,149,43,0.1)', border: 'none', color: 'var(--accent)', cursor: 'pointer', padding: '0.6rem 0.8rem', borderRadius: '0.4rem', fontWeight: 'bold', fontSize: '0.9rem' }}
-                >
-                  📥 Descargar
-                </button>
+                {doc.url ? (
+                  <a href={doc.url} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(201,149,43,0.1)', color: 'var(--accent)', textDecoration: 'none', padding: '0.6rem 0.8rem', borderRadius: '0.4rem', fontWeight: 'bold', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center' }}>
+                    📥 Descargar
+                  </a>
+                ) : (
+                  <button 
+                    onClick={() => alert(`Archivo no disponible para descarga inmediata.`)}
+                    style={{ background: 'rgba(201,149,43,0.1)', border: 'none', color: 'var(--accent)', cursor: 'pointer', padding: '0.6rem 0.8rem', borderRadius: '0.4rem', fontWeight: 'bold', fontSize: '0.9rem' }}
+                  >
+                    📥 Descargar
+                  </button>
+                )}
               </div>
             ))}
           </div>

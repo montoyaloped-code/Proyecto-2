@@ -26,7 +26,7 @@ export default function GaleriaSection() {
   const displayedImages = galleryImages.slice(0, 6);
 
   return (
-    <section className="section-padding" style={{ background: '#f0fdf4' }}>
+    <section className="section-padding" style={{ background: 'var(--background)', borderTop: '1px solid var(--border)' }}>
       <div className="container">
         <h2 className="section-title">Nuestra Galería</h2>
         <p className="section-subtitle">Momentos que construyen nuestra historia y comunidad.</p>

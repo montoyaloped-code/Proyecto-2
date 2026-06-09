@@ -1,11 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import '../App.css';
 import '../sedes-style.css';
 
-
-
-const sedesData = [
+const INITIAL_SEDES = [
   {
     slug: "liceo-principal",
     name: "Liceo Ignacio Yepes Yepes",
@@ -154,6 +152,20 @@ const sedesData = [
 export default function Sedes() {
   const [activeFilter, setActiveFilter] = useState('all');
   const [selectedSede, setSelectedSede] = useState(null);
+  const [sedesData, setSedesData] = useState(INITIAL_SEDES);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('listaSedes');
+    if (stored) {
+      const data = JSON.parse(stored);
+      if (data.length > 0) {
+        setSedesData(data);
+      }
+    } else {
+      // Si es la primera vez, guardamos las iniciales para que el admin las vea
+      localStorage.setItem('listaSedes', JSON.stringify(INITIAL_SEDES));
+    }
+  }, []);
 
   const filteredSedes = activeFilter === 'all'
     ? sedesData

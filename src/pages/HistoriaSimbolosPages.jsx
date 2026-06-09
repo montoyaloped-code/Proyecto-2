@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import '../App.css'; 
 
 export default function HistoriaSimbolosPages() {
   const [tabActiva, setTabActiva] = useState('historia');
 
-  const hitosHistoria = [
+  const HITOS_ESTATICOS = [
     {
       año: "1939",
       titulo: "Fundación y Primeros Pasos",
@@ -43,6 +43,21 @@ export default function HistoriaSimbolosPages() {
     }
   ];
 
+  // Estado para la historia dinámica
+  const [hitosHistoria, setHitosHistoria] = useState([]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('listaHistoria');
+    if (stored) {
+      const data = JSON.parse(stored);
+      if (data.length > 0) {
+        setHitosHistoria(data);
+        return;
+      }
+    }
+    setHitosHistoria(HITOS_ESTATICOS);
+  }, []);
+
   const simbolos = [
     { icon: "⭕", nombre: "Círculo", desc: "Representa la integración institucional, la cohesión comunitaria y la unidad de los diferentes estamentos educativos." },
     { icon: "🕊️", nombre: "Paloma", desc: "El gran emblema de la paz y la libertad que se siembra y se vive activamente dentro del ambiente de nuestra comunidad educativa." },
@@ -58,14 +73,14 @@ export default function HistoriaSimbolosPages() {
         
         {/* Encabezado */}
         <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-          <span style={{ fontSize: '0.875rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#057a55', backgroundColor: '#e6f4ea', padding: '6px 16px', borderRadius: '9999px' }}>
+          <span style={{ fontSize: '0.875rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--primary)', backgroundColor: 'var(--muted)', padding: '6px 16px', borderRadius: '9999px' }}>
             Identidad Institucional
           </span>
           <h1 style={{ marginTop: '1.5rem', fontSize: '2.5rem', fontWeight: '800', color: 'var(--primary)' }}>
             Historia y Símbolos
           </h1>
           <div className='divider'></div>
-          <p style={{ marginTop: '1rem', fontSize: '1.125rem', color: 'var(--muted)', maxWidth: '700px', margin: '1rem auto 0' }}>
+          <p style={{ marginTop: '1rem', fontSize: '1.125rem', color: 'var(--muted-text)', maxWidth: '700px', margin: '1rem auto 0' }}>
             Conoce las raíces, las transformaciones históricas y los emblemas oficiales que forjan el espíritu de la I.E. Ignacio Yepes Yepes.
           </p>
         </div>
@@ -85,8 +100,8 @@ export default function HistoriaSimbolosPages() {
               fontSize: '1.125rem',
               fontWeight: '600',
               cursor: 'pointer',
-              color: tabActiva === 'historia' ? '#057a55' : '#64748b',
-              borderBottom: tabActiva === 'historia' ? '4px solid #057a55' : '4px solid transparent',
+              color: tabActiva === 'historia' ? 'var(--primary)' : 'var(--muted-text)',
+              borderBottom: tabActiva === 'historia' ? '4px solid var(--primary)' : '4px solid transparent',
               marginBottom: '-2px',
               transition: 'all 0.2s'
             }}
@@ -106,8 +121,8 @@ export default function HistoriaSimbolosPages() {
               fontSize: '1.125rem',
               fontWeight: '600',
               cursor: 'pointer',
-              color: tabActiva === 'simbolos' ? '#057a55' : '#64748b',
-              borderBottom: tabActiva === 'simbolos' ? '4px solid #057a55' : '4px solid transparent',
+              color: tabActiva === 'simbolos' ? 'var(--primary)' : 'var(--muted-text)',
+              borderBottom: tabActiva === 'simbolos' ? '4px solid var(--primary)' : '4px solid transparent',
               marginBottom: '-2px',
               transition: 'all 0.2s'
             }}
@@ -128,10 +143,10 @@ export default function HistoriaSimbolosPages() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               {hitosHistoria.map((hito, idx) => (
-                <div key={idx} className="card" style={{ padding: '24px', borderLeft: '5px solid #057a55' }}>
+                <div key={idx} className="card" style={{ padding: '24px', borderLeft: '5px solid var(--primary)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
                     <h3 style={{ margin: 0, color: 'var(--foreground)', fontSize: '1.3rem' }}>{hito.titulo}</h3>
-                    <span style={{ backgroundColor: '#057a55', color: 'white', padding: '4px 12px', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.9rem' }}>
+                    <span style={{ backgroundColor: 'var(--primary)', color: 'var(--primary-fg)', padding: '4px 12px', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.9rem' }}>
                       {hito.año}
                     </span>
                   </div>
@@ -140,10 +155,8 @@ export default function HistoriaSimbolosPages() {
                   </p>
                 </div>
               ))}
-            </div>
-
-            <div className="card" style={{ padding: '32px', backgroundColor: '#057a55', color: 'white', textAlign: 'center', marginTop: '1rem' }}>
-              <h3 style={{ color: 'white', marginTop: 0, marginBottom: '0.5rem' }}>La Institución Hoy</h3>
+            </div>            <div className="card featured-card" style={{ padding: '32px', textAlign: 'center', marginTop: '1rem' }}>
+              <h3 style={{ marginTop: 0, marginBottom: '0.5rem' }}>La Institución Hoy</h3>
               <p style={{ color: '#e6f4ea', lineHeight: '1.6', margin: 0 }}>
                 Hoy la Institución Educativa Ignacio Yepes Yepes es uno de los lugares más importantes para nuestro municipio. Cuenta con la mayor población estudiantil y desarrolla múltiples procesos sociales, culturales, deportivos y formativos en una hermosa infraestructura rodeada de zonas verdes.
               </p>
@@ -158,7 +171,7 @@ export default function HistoriaSimbolosPages() {
             <img src="ESCUDO.png" alt="Escudo de la institución" style={{ width: '50%', maxWidth: '180px', height: 'auto', display: 'block', margin: '0 auto', border: "150px" }} />
             <div className="card" style={{ padding: '28px' }}>
               <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-                <span style={{ fontSize: '0.85rem', fontWeight: '700', textTransform: 'uppercase', color: '#057a55', letterSpacing: '0.05em' }}>Identidad Visual</span>
+                <span style={{ fontSize: '0.85rem', fontWeight: '700', textTransform: 'uppercase', color: 'var(--primary)', letterSpacing: '0.05em' }}>Identidad Visual</span>
                 <h2 style={{ color: 'var(--foreground)', marginTop: '0.25rem', marginBottom: '1rem' }}>El Escudo Institucional</h2>
               </div>
               <p style={{ color: 'var(--muted-text)', lineHeight: '1.6', textAlign: 'center', marginBottom: '2rem' }}>
@@ -168,10 +181,10 @@ export default function HistoriaSimbolosPages() {
               {/* Cuadrícula de elementos del escudo */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
                 {simbolos.map((sym, idx) => (
-                  <div key={idx} style={{ backgroundColor: 'var(--muted)', padding: '20px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                  <div key={idx} className="card" style={{ padding: '20px', backgroundColor: 'var(--card)' }}>
                     <div style={{ fontSize: '1.75rem', marginBottom: '0.5rem' }}>{sym.icon}</div>
-                    <h4 style={{ color: '#057a55', margin: '0 0 0.5rem 0', fontSize: '1.1rem', fontWeight: '700' }}>{sym.nombre}</h4>
-                    <p style={{ color: '#64748b', fontSize: '0.95rem', margin: 0, lineHeight: '1.5' }}>{sym.desc}</p>
+                    <h4 style={{ color: 'var(--primary)', margin: '0 0 0.5rem 0', fontSize: '1.1rem', fontWeight: '700' }}>{sym.nombre}</h4>
+                    <p style={{ fontSize: '0.95rem', margin: 0, lineHeight: '1.5' }}>{sym.desc}</p>
                   </div>
                 ))}
               </div>
@@ -180,23 +193,23 @@ export default function HistoriaSimbolosPages() {
             <img src="Bandera.jpeg" alt="Bandera de la institución" style={{ width: '50%', maxWidth: '180px', height: 'auto', display: 'block', margin: '0 auto', border: "150px" }} />
             <div className="card" style={{ padding: '28px' }}>
               <h2 style={{ color: 'var(--foreground)', marginTop: 0, marginBottom: '0.5rem', textAlign: 'center' }}>La Bandera</h2>
-              <p style={{ color: '#475569', textTransform: 'none', textAlign: 'center', fontSize: '0.95rem', color: '#64748b' }}>
+              <p style={{ textTransform: 'none', textAlign: 'center', fontSize: '0.95rem', color: 'var(--muted-text)' }}>
                 DISEÑADA POR: Licenciado Juan Fernando Álvarez A., educador de la institución.
               </p>
-              <div style={{ borderLeft: '4px solid #057a55', paddingLeft: '1rem', margin: '1.5rem 0', backgroundColor: 'var(--muted)', padding: '12px' }}>
-                <p style={{ color: '#166534', fontStyle: 'italic', margin: 0, lineHeight: '1.6' }}>
+              <div style={{ borderLeft: '4px solid var(--primary)', paddingLeft: '1rem', margin: '1.5rem 0', backgroundColor: 'var(--card)', padding: '12px', borderRadius: '0 8px 8px 0' }}>
+                <p style={{ color: 'var(--foreground)', fontStyle: 'italic', margin: 0, lineHeight: '1.6' }}>
                   "Está conformada por un solo fondo de color verde, con el escudo de la institución en el centro. Simboliza el color de la esperanza de todos sus miembros en un futuro lleno de sabiduría, y convoca al amor y respeto a la patria, la constitución y las leyes."
                 </p>
               </div>
             </div>
 
             {/* El Lema */}
-            <div className="card" style={{ padding: '32px', textAlign: 'center', backgroundColor: 'var(--card)', color: 'white' }}>
-              <span style={{ color: '#10b981', fontWeight: '700', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>LEMA INSTITUTIONAL</span>
-              <p style={{ fontSize: '1.75rem', fontStyle: 'italic', fontWeight: '700', margin: '0.75rem 0', color: 'white' }}>
+            <div className="card featured-card" style={{ padding: '32px', textAlign: 'center' }}>
+              <span style={{ color: 'var(--accent)', fontWeight: '700', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>LEMA INSTITUTIONAL</span>
+              <p style={{ fontSize: '1.75rem', fontStyle: 'italic', fontWeight: '700', margin: '0.75rem 0' }}>
                 "Dios y amor de Patria. Con fidelidad mientras se viva."
               </p>
-              <p style={{ color: '#94a3b8', fontSize: '0.9rem', margin: 0 }}>
+              <p style={{ color: 'var(--muted-fg)', fontSize: '0.9rem', margin: 0 }}>
                 ¡Ignacistas somos Ignacistas! Será siempre nuestra consigna.
               </p>
             </div>

@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import '../App.css';
 
 export default function PsicologiaPages() {
   const [activeCard, setActiveCard] = useState(null);
 
-  const temas = [
+  const TEMAS_ESTATICOS = [
     {
       id: 1,
       icon: "🧠",
@@ -34,6 +34,18 @@ export default function PsicologiaPages() {
       details: "Sentirse triste, frustrado o abrumado es completamente normal. Aquí te brindamos herramientas de inteligencia emocional para procesar los cambios de la juventud. No tienes que llevar todas tus cargas solo; hablar de lo que te pasa es el primer paso."
     }
   ];
+
+  // Estado para los temas dinámicos
+  const [temas, setTemas] = useState([]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('psicologiaTemas');
+    if (stored && JSON.parse(stored).length > 0) {
+      setTemas(JSON.parse(stored));
+    } else {
+      setTemas(TEMAS_ESTATICOS);
+    }
+  }, []);
 
   return (
     <main className="container" style={{ padding: '4rem 1rem', minHeight: '80vh' }}>
