@@ -171,7 +171,7 @@ a {
 .card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow);
-  background-color: #ddd;
+
 }
 .card .thumb {
   aspect-ratio: 16/10;

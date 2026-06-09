@@ -229,6 +229,27 @@ export default function Sedes() {
                     </div>
                   </div>
                 )}
+
+                {currentSede.gallery && currentSede.gallery.length > 0 && (
+                  <div style={{ marginTop: '40px' }}>
+                    <h2>Galería de la sede</h2>
+                    <div style={{ 
+                      display: 'grid', 
+                      gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', 
+                      gap: '15px',
+                      marginTop: '15px' 
+                    }}>
+                      {currentSede.gallery.map((imgUrl, index) => (
+                        <img 
+                          key={index} 
+                          src={imgUrl} 
+                          alt={`${currentSede.name} - ${index + 1}`} 
+                          style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '8px' }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <aside className="side">
