@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
 import '../App.css';
 import '../sedes-style.css';
 import ModuloInduccion from '../components/ModuloInduccion';
@@ -15,11 +16,14 @@ export default function DocenciaPages() {
   const [directivos, setDirectivos] = useState([]);
 
   useEffect(() => {
-    const storedDocentes = localStorage.getItem('listaDocentes');
-    if (storedDocentes) setDocentes(JSON.parse(storedDocentes));
-    
-    const storedDirectivos = localStorage.getItem('listaDirectivos');
-    if (storedDirectivos) setDirectivos(JSON.parse(storedDirectivos));
+    const fetchData = async () => {
+      const { data: docentesData, error: dError } = await supabase.from('docentes').select('*').order('nombre');
+      if (!dError) setDocentes(docentesData || []);
+
+      const { data: directivosData, error: dirError } = await supabase.from('directivos').select('*');
+      if (!dirError) setDirectivos(directivosData || []);
+    };
+    fetchData();
   }, []);
 
   const AREAS_INICIALES = [

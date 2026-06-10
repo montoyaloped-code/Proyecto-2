@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { supabase } from '../supabaseClient';
 import '../App.css';
 
 export default function CuadroDeHonorPages() {
@@ -6,10 +7,11 @@ export default function CuadroDeHonorPages() {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    const storedStudents = localStorage.getItem('honorStudents');
-    if (storedStudents) {
-      setHonorStudents(JSON.parse(storedStudents));
-    }
+    const fetchHonor = async () => {
+      const { data, error } = await supabase.from('cuadro_honor').select('*');
+      if (!error && data) setHonorStudents(data);
+    };
+    fetchHonor();
   }, []);
 
   useEffect(() => {

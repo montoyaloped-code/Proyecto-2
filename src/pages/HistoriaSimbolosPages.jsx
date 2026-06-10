@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
 import '../App.css'; 
 
 export default function HistoriaSimbolosPages() {
@@ -47,15 +48,15 @@ export default function HistoriaSimbolosPages() {
   const [hitosHistoria, setHitosHistoria] = useState([]);
 
   useEffect(() => {
-    const stored = localStorage.getItem('listaHistoria');
-    if (stored) {
-      const data = JSON.parse(stored);
-      if (data.length > 0) {
+    const fetchHistory = async () => {
+      const { data, error } = await supabase.from('historia').select('*').order('año');
+      if (!error && data && data.length > 0) {
         setHitosHistoria(data);
-        return;
+      } else {
+        setHitosHistoria(HITOS_ESTATICOS);
       }
-    }
-    setHitosHistoria(HITOS_ESTATICOS);
+    };
+    fetchHistory();
   }, []);
 
   const simbolos = [

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '../supabaseClient';
 import '../App.css';
 
 export default function AtencionCiudadanaPages() {
@@ -54,12 +55,15 @@ export default function AtencionCiudadanaPages() {
   const [documentos, setDocumentos] = useState([]);
 
   useEffect(() => {
-    const stored = localStorage.getItem('transparenciaDocs');
-    if (stored && JSON.parse(stored).length > 0) {
-      setDocumentos(JSON.parse(stored));
-    } else {
-      setDocumentos(DOCUMENTOS_ESTATICOS);
-    }
+    const fetchTransparencia = async () => {
+      const { data, error } = await supabase.from('transparencia').select('*');
+      if (!error && data && data.length > 0) {
+        setDocumentos(data);
+      } else {
+        setDocumentos(DOCUMENTOS_ESTATICOS);
+      }
+    };
+    fetchTransparencia();
   }, []);
 
   return (
@@ -72,7 +76,6 @@ export default function AtencionCiudadanaPages() {
           Cumplimos con la normatividad de transparencia ciudadana de Colombia. Envía tus solicitudes o descarga documentación legal oficial.
         </p>
       </div>
-
       <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '3rem', alignItems: 'flex-start' }}>
         
         {/* LADO A: BUZÓN */}

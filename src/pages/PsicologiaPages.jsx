@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '../supabaseClient';
 import '../App.css';
 
 export default function PsicologiaPages() {
@@ -39,12 +40,15 @@ export default function PsicologiaPages() {
   const [temas, setTemas] = useState([]);
 
   useEffect(() => {
-    const stored = localStorage.getItem('psicologiaTemas');
-    if (stored && JSON.parse(stored).length > 0) {
-      setTemas(JSON.parse(stored));
-    } else {
-      setTemas(TEMAS_ESTATICOS);
-    }
+    const fetchPsicologia = async () => {
+      const { data, error } = await supabase.from('psicologia').select('*');
+      if (!error && data && data.length > 0) {
+        setTemas(data);
+      } else {
+        setTemas(TEMAS_ESTATICOS);
+      }
+    };
+    fetchPsicologia();
   }, []);
 
   return (

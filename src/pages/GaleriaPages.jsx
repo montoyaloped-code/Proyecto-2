@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
 import '../App.css'; //
 
 export default function GaleriaPages() {
@@ -11,10 +12,15 @@ export default function GaleriaPages() {
   }, []);
 
   // Cargar imágenes de la galería desde localStorage
-  const [galleryImages, setGalleryImages] = useState(() => {
-    const stored = localStorage.getItem('galleryImages');
-    return stored ? JSON.parse(stored) : [];
-  });
+  const [galleryImages, setGalleryImages] = useState([]);
+
+  useEffect(() => {
+    const fetchGallery = async () => {
+      const { data, error } = await supabase.from('galeria').select('*').order('created_at', { ascending: false });
+      if (!error && data) setGalleryImages(data);
+    };
+    fetchGallery();
+  }, []);
 
   return (
     <div className="page-layout" style={{ paddingTop: '80px', minHeight: '80vh' }}>

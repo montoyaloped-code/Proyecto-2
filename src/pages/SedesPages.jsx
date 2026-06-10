@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
 import '../App.css';
 import '../sedes-style.css';
 
@@ -155,16 +156,13 @@ export default function Sedes() {
   const [sedesData, setSedesData] = useState(INITIAL_SEDES);
 
   useEffect(() => {
-    const stored = localStorage.getItem('listaSedes');
-    if (stored) {
-      const data = JSON.parse(stored);
-      if (data.length > 0) {
+    const fetchSedes = async () => {
+      const { data, error } = await supabase.from('sedes').select('*');
+      if (!error && data && data.length > 0) {
         setSedesData(data);
       }
-    } else {
-      // Si es la primera vez, guardamos las iniciales para que el admin las vea
-      localStorage.setItem('listaSedes', JSON.stringify(INITIAL_SEDES));
-    }
+    };
+    fetchSedes();
   }, []);
 
   const filteredSedes = activeFilter === 'all'
