@@ -182,9 +182,11 @@ export default function Sedes() {
               <button className="back-link" onClick={() => setSelectedSede(null)}>
                 ← Volver a sedes
               </button>
-              <span className={`badge ${currentSede.tipo.toLowerCase()}`} style={{ position: 'static', display: 'inline-block', marginTop: '14px' }}>
-                Sede {currentSede.tipo}
-              </span>
+              <div className="sede-header-meta">
+                <span className={`badge ${currentSede.tipo.toLowerCase()}`}>
+                  Sede {currentSede.tipo}
+                </span>
+              </div>
               <h1>{currentSede.name}</h1>
             </div>
           </section>

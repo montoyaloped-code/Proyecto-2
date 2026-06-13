@@ -4,7 +4,7 @@ import { SedesCard } from './Card';
 
 export default function SedesSection() {
   return (
-    <section id="sedes" className="section-padding" style={{ background: 'rgba(240, 244, 239, 0.9)' }}>
+    <section id="sedes" className="section-padding sedes-home-bg">
       <div className="container">
         <h2 className="section-title">Nuestras Sedes</h2>
         <p className="section-subtitle">11 sedes urbanas y rurales comprometidas con la excelencia educativa.</p>
@@ -33,4 +33,3 @@ export default function SedesSection() {
     </section>
   );
 }
-

@@ -294,29 +294,44 @@ a {
 .hero .container {
   position: relative;
   z-index: 1;
-  padding-top: 48px;
-  padding-bottom: 32px;
+  padding-top: 60px;
+  padding-bottom: 40px;
+  width: 100%;
 }
 .hero h1 {
   color: #fff;
   font-size: clamp(2rem, 4vw, 3rem);
-  margin-top: 10px;
+  margin-top: 8px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 .back-link {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 10px;
   color: #fff;
-  opacity: 0.9;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   cursor: pointer;
-  background: none;
-  border: none;
-  font: inherit;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  padding: 12px 24px;
+  border-radius: 50px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-bottom: 3rem;
 }
 .back-link:hover {
-  color: var(--accent);
+  background: #fff;
+  color: #006400;
+  border-color: #fff;
+  transform: translateX(-5px);
 }
+
+.sede-header-meta {
+  margin-bottom: 8px;
+}
+.badge { position: static !important; display: inline-block !important; }
 
 .detail-grid {
   display: grid;
@@ -428,6 +443,12 @@ body.dark {
   --border: #1a3a20;
   background: var(--bg) !important;
   color: var(--text) !important;
+}
+
+body.dark .btn,
+body.dark .btn-primary,
+body.dark .chip.active {
+  color: #000000 !important;
 }
 
 /* Cambia las tarjetas de la sección sedes */

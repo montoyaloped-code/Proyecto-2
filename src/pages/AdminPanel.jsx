@@ -4,6 +4,19 @@ import '../App.css'; // Import global styles
 
 export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState('directivos'); // 'directivos', 'docentes', 'galeria', 'cuadro-honor', 'constitucion', 'historia', 'psicologia', 'transparencia', 'sedes'
+  const [loading, setLoading] = useState(true);
+
+  // --- Admin Menu State & Logic ---
+  const [adminMobileMenuOpen, setAdminMobileMenuOpen] = useState(false);
+
+  const toggleAdminMobileMenu = () => {
+    setAdminMobileMenuOpen(!adminMobileMenuOpen);
+  };
+
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
+    setAdminMobileMenuOpen(false);
+  };
 
   // --- Docentes State & Logic ---
   const [docentes, setDocentes] = useState([]);
@@ -31,6 +44,7 @@ export default function AdminPanel() {
         fetchTransparencia(),
         fetchSedes()
       ]);
+      setLoading(false);
     };
     loadInitialData();
   }, []);
@@ -84,8 +98,6 @@ export default function AdminPanel() {
   const [imageAlt, setImageAlt] = useState('');
   const [isLarge, setIsLarge] = useState(false);
   const [editingImageId, setEditingImageId] = useState(null);
-
-  useEffect(() => { fetchGallery(); }, []);
 
   const fetchGallery = async () => {
     const { data, error } = await supabase.from('galeria').select('*').order('created_at', { ascending: false });
@@ -419,8 +431,18 @@ export default function AdminPanel() {
     }
   };
 
+  if (loading) {
+    return (
+      <main className="container admin-panel-main">
+        <div className="spinner-container">
+          <div className="spinner"></div>
+        </div>
+      </main>
+    );
+  }
+
   return (
-    <main className="container" style={{ padding: '4rem 1rem', minHeight: '80vh' }}>
+    <main className="container admin-panel-main">
       <div className="section-head" style={{ textAlign: 'center', marginBottom: '3rem' }}>
         <span className="eyebrow" style={{ color: 'var(--accent)' }}>Panel de Administración</span>
         <h2 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)' }}>Gestión de Contenidos</h2>
@@ -429,59 +451,70 @@ export default function AdminPanel() {
         </p>
       </div>
 
+      {/* Hamburger button for admin panel on mobile */}
+      <button
+        className="admin-hamburger"
+        type="button"
+        onClick={toggleAdminMobileMenu}
+        aria-label="Abrir menú de administración"
+        aria-expanded={adminMobileMenuOpen}
+      >
+        {adminMobileMenuOpen ? '✕ Cerrar Menú' : '☰ Gestión de Contenidos'}
+      </button>
+
       {/* Navegación por pestañas */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', borderBottom: '2px solid #e2e8f0', marginBottom: '3rem' }}>
+      <div className={`admin-tabs-nav ${adminMobileMenuOpen ? 'open' : ''}`}>
         <button
-          onClick={() => setActiveTab('directivos')}
-          style={{ paddingBottom: '1rem', background: 'none', border: 'none', fontSize: '1.125rem', fontWeight: '600', cursor: 'pointer', color: activeTab === 'directivos' ? 'var(--primary)' : 'var(--muted-fg)', borderBottom: activeTab === 'directivos' ? '4px solid var(--primary)' : '4px solid transparent', transition: 'all 0.2s' }}
+          onClick={() => handleTabClick('directivos')}
+          className={`admin-tab-button ${activeTab === 'directivos' ? 'active' : ''}`}
         >
           🏛️ Directivos
         </button>
         <button
-          onClick={() => setActiveTab('docentes')}
-          style={{ paddingBottom: '1rem', background: 'none', border: 'none', fontSize: '1.125rem', fontWeight: '600', cursor: 'pointer', color: activeTab === 'docentes' ? 'var(--primary)' : 'var(--muted-fg)', borderBottom: activeTab === 'docentes' ? '4px solid var(--primary)' : '4px solid transparent', transition: 'all 0.2s' }}
+          onClick={() => handleTabClick('docentes')}
+          className={`admin-tab-button ${activeTab === 'docentes' ? 'active' : ''}`}
         >
           🧑‍🏫 Docentes
         </button>
         <button
-          onClick={() => setActiveTab('galeria')}
-          style={{ paddingBottom: '1rem', background: 'none', border: 'none', fontSize: '1.125rem', fontWeight: '600', cursor: 'pointer', color: activeTab === 'galeria' ? 'var(--primary)' : 'var(--muted-fg)', borderBottom: activeTab === 'galeria' ? '4px solid var(--primary)' : '4px solid transparent', transition: 'all 0.2s' }}
+          onClick={() => handleTabClick('galeria')}
+          className={`admin-tab-button ${activeTab === 'galeria' ? 'active' : ''}`}
         >
           📸 Galería
         </button>
         <button
-          onClick={() => setActiveTab('historia')}
-          style={{ paddingBottom: '1rem', background: 'none', border: 'none', fontSize: '1.125rem', fontWeight: '600', cursor: 'pointer', color: activeTab === 'historia' ? 'var(--primary)' : 'var(--muted-fg)', borderBottom: activeTab === 'historia' ? '4px solid var(--primary)' : '4px solid transparent', transition: 'all 0.2s' }}
+          onClick={() => handleTabClick('historia')}
+          className={`admin-tab-button ${activeTab === 'historia' ? 'active' : ''}`}
         >
           📜 Historia
         </button>
         <button
-          onClick={() => setActiveTab('sedes')}
-          style={{ paddingBottom: '1rem', background: 'none', border: 'none', fontSize: '1.125rem', fontWeight: '600', cursor: 'pointer', color: activeTab === 'sedes' ? 'var(--primary)' : 'var(--muted-fg)', borderBottom: activeTab === 'sedes' ? '4px solid var(--primary)' : '4px solid transparent', transition: 'all 0.2s' }}
+          onClick={() => handleTabClick('sedes')}
+          className={`admin-tab-button ${activeTab === 'sedes' ? 'active' : ''}`}
         >
           🏫 Sedes
         </button>
         <button
-          onClick={() => setActiveTab('psicologia')}
-          style={{ paddingBottom: '1rem', background: 'none', border: 'none', fontSize: '1.125rem', fontWeight: '600', cursor: 'pointer', color: activeTab === 'psicologia' ? 'var(--primary)' : 'var(--muted-fg)', borderBottom: activeTab === 'psicologia' ? '4px solid var(--primary)' : '4px solid transparent', transition: 'all 0.2s' }}
+          onClick={() => handleTabClick('psicologia')}
+          className={`admin-tab-button ${activeTab === 'psicologia' ? 'active' : ''}`}
         >
           🧠 Salud Mental
         </button>
         <button
-          onClick={() => setActiveTab('transparencia')}
-          style={{ paddingBottom: '1rem', background: 'none', border: 'none', fontSize: '1.125rem', fontWeight: '600', cursor: 'pointer', color: activeTab === 'transparencia' ? 'var(--primary)' : 'var(--muted-fg)', borderBottom: activeTab === 'transparencia' ? '4px solid var(--primary)' : '4px solid transparent', transition: 'all 0.2s' }}
+          onClick={() => handleTabClick('transparencia')}
+          className={`admin-tab-button ${activeTab === 'transparencia' ? 'active' : ''}`}
         >
           📂 Atención Ciudadana
         </button>
         <button
-          onClick={() => setActiveTab('cuadro-honor')}
-          style={{ paddingBottom: '1rem', background: 'none', border: 'none', fontSize: '1.125rem', fontWeight: '600', cursor: 'pointer', color: activeTab === 'cuadro-honor' ? 'var(--primary)' : 'var(--muted-fg)', borderBottom: activeTab === 'cuadro-honor' ? '4px solid var(--primary)' : '4px solid transparent', transition: 'all 0.2s' }}
+          onClick={() => handleTabClick('cuadro-honor')}
+          className={`admin-tab-button ${activeTab === 'cuadro-honor' ? 'active' : ''}`}
         >
           🏆 Cuadro de Honor
         </button>
         <button
-          onClick={() => setActiveTab('constitucion')}
-          style={{ paddingBottom: '1rem', background: 'none', border: 'none', fontSize: '1.125rem', fontWeight: '600', cursor: 'pointer', color: activeTab === 'constitucion' ? 'var(--primary)' : 'var(--muted-fg)', borderBottom: activeTab === 'constitucion' ? '4px solid var(--primary)' : '4px solid transparent', transition: 'all 0.2s' }}
+          onClick={() => handleTabClick('constitucion')}
+          className={`admin-tab-button ${activeTab === 'constitucion' ? 'active' : ''}`}
         >
           ⚖️ Horas Legales
         </button>
@@ -491,25 +524,25 @@ export default function AdminPanel() {
       {activeTab === 'directivos' && (
         <section>
           <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1.5rem', color: 'var(--primary)' }}>Gestión de Directivos</h3>
-          <form onSubmit={handleDirectivoSubmit} className="card" style={{ padding: '2.5rem 2rem', marginBottom: '3rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            <div>
-              <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.4rem' }}>Nombre Completo</label>
-              <input type="text" required style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: '#fff', fontSize: '0.95rem' }} value={nombreDirectivo} onChange={e => setNombreDirectivo(e.target.value)} />
+          <form onSubmit={handleDirectivoSubmit} className="admin-form">
+            <div className="form-group">
+              <label>Nombre Completo</label>
+              <input type="text" required value={nombreDirectivo} onChange={e => setNombreDirectivo(e.target.value)} />
             </div>
-            <div>
-              <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.4rem' }}>Cargo</label>
-              <select value={cargoDirectivo} onChange={e => setCargoDirectivo(e.target.value)} required style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: '#fff' }}>
+            <div className="form-group">
+              <label>Cargo</label>
+              <select value={cargoDirectivo} onChange={e => setCargoDirectivo(e.target.value)} required>
                 <option value="">Seleccionar cargo...</option>
                 {CARGOS_DIRECTIVOS.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
-            <button type="submit" className="btn" style={{ background: 'var(--primary)', color: 'white', padding: '0.85rem' }}>
+            <button type="submit" className="btn-submit">
               {editingDirectivoId !== null ? 'Guardar Cambios' : 'Registrar Directivo'}
             </button>
           </form>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
-            {directivos.map((d, idx) => (
-              <div key={idx} className="card" style={{ padding: '1.5rem' }}>
+            {directivos.map((d) => (
+              <div key={d.id} className="card" style={{ padding: '1.5rem' }}>
                 <h4 style={{ color: 'var(--primary)', margin: 0 }}>{d.nombre}</h4>
                 <p style={{ fontSize: '0.85rem', color: 'var(--accent)', fontWeight: 'bold' }}>{d.cargo}</p>
                 <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
@@ -525,35 +558,35 @@ export default function AdminPanel() {
       {activeTab === 'docentes' && (
         <section>
           <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1.5rem', color: 'var(--primary)' }}>Gestión de Docentes</h3>
-          <form onSubmit={handleDocenteSubmit} className="card" style={{ padding: '2.5rem 2rem', marginBottom: '3rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            <div>
-              <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.4rem' }}>Nombre Completo</label>
-              <input type="text" required style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: '#fff', fontSize: '0.95rem' }} value={nombreDocente} onChange={e => setNombreDocente(e.target.value)} />
+          <form onSubmit={handleDocenteSubmit} className="admin-form">
+            <div className="form-group">
+              <label>Nombre Completo</label>
+              <input type="text" required value={nombreDocente} onChange={e => setNombreDocente(e.target.value)} />
             </div>
-            <div>
-              <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.4rem' }}>URL de la Foto (Opcional)</label>
-              <input type="url" placeholder="https://ejemplo.com/foto.jpg" style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: '#fff', fontSize: '0.95rem' }} value={fotoDocente} onChange={e => setFotoDocente(e.target.value)} />
+            <div className="form-group">
+              <label>URL de la Foto (Opcional)</label>
+              <input type="url" placeholder="https://ejemplo.com/foto.jpg" value={fotoDocente} onChange={e => setFotoDocente(e.target.value)} />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-              <div>
-                <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.4rem' }}>Área</label>
-                <select value={areaDocente} onChange={e => setAreaDocente(e.target.value)} required style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: '#fff' }}>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Área</label>
+                <select value={areaDocente} onChange={e => setAreaDocente(e.target.value)} required>
                   <option value="">Seleccionar...</option>
                   {AREAS_ESTATICAS.map(a => <option key={a} value={a}>{a}</option>)}
                 </select>
               </div>
-              <div>
-                <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.4rem' }}>Cargo</label>
-                <input type="text" value={cargoDocente} onChange={e => setCargoDocente(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: '#fff' }} />
+              <div className="form-group">
+                <label>Cargo</label>
+                <input type="text" value={cargoDocente} onChange={e => setCargoDocente(e.target.value)} />
               </div>
             </div>
-            <button type="submit" className="btn" style={{ background: 'var(--primary)', color: 'white', padding: '0.85rem' }}>
+            <button type="submit" className="btn-submit">
               {editingDocenteId !== null ? 'Guardar Cambios' : 'Registrar Docente'}
             </button>
           </form>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
-            {docentes.map((d, idx) => (
-              <div key={idx} className="card" style={{ padding: '1.5rem' }}>
+            {docentes.map((d) => (
+              <div key={d.id} className="card" style={{ padding: '1.5rem' }}>
                 {d.foto && (
                   <img src={d.foto} alt={d.nombre} style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', marginBottom: '1rem', border: '2px solid var(--primary)' }} />
                 )}
@@ -573,26 +606,26 @@ export default function AdminPanel() {
       {activeTab === 'galeria' && (
         <section>
           <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1.5rem', color: 'var(--primary)' }}>Gestión de Galería</h3>
-          <form onSubmit={handleImageSubmit} className="card" style={{ padding: '2.5rem 2rem', marginBottom: '3rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            <div>
-              <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.4rem' }}>URL de la Imagen</label>
-              <input type="url" required style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: '#fff', fontSize: '0.95rem' }} value={imageUrl} onChange={e => setImageUrl(e.target.value)} />
+          <form onSubmit={handleImageSubmit} className="admin-form">
+            <div className="form-group">
+              <label>URL de la Imagen</label>
+              <input type="url" required value={imageUrl} onChange={e => setImageUrl(e.target.value)} />
             </div>
-            <div>
-              <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.4rem' }}>Texto Alternativo (Alt)</label>
-              <input type="text" required style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: '#fff', fontSize: '0.95rem' }} value={imageAlt} onChange={e => setImageAlt(e.target.value)} />
+            <div className="form-group">
+              <label>Texto Alternativo (Alt)</label>
+              <input type="text" required value={imageAlt} onChange={e => setImageAlt(e.target.value)} />
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               <input type="checkbox" id="isLarge" checked={isLarge} onChange={e => setIsLarge(e.target.checked)} />
-              <label htmlFor="isLarge">Mostrar como imagen grande en la sección principal</label>
+              <label htmlFor="isLarge" style={{ margin: 0 }}>Mostrar como imagen grande en la sección principal</label>
             </div>
-            <button type="submit" className="btn" style={{ background: 'var(--primary)', color: 'white', padding: '0.85rem' }}>
+            <button type="submit" className="btn-submit">
               {editingImageId !== null ? 'Actualizar Imagen' : 'Añadir Imagen'}
             </button>
           </form>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '1rem' }}>
-            {galleryImages.map((img, idx) => (
-              <div key={idx} className="card" style={{ padding: '1rem' }}>
+            {galleryImages.map((img) => (
+              <div key={img.id} className="card" style={{ padding: '1rem' }}>
                 <img src={img.thumb} alt={img.alt} style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: '0.5rem', marginBottom: '0.5rem' }} />
                 <p style={{ fontSize: '0.8rem', margin: 0 }}>{img.alt}</p>
                 <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
@@ -608,29 +641,29 @@ export default function AdminPanel() {
       {activeTab === 'historia' && (
         <section>
           <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1.5rem', color: 'var(--primary)' }}>Gestión de Historia Institucional</h3>
-          <form onSubmit={handleHistorySubmit} className="card" style={{ padding: '2.5rem 2rem', marginBottom: '3rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '1rem' }}>
-              <div>
-                <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.4rem' }}>Año</label>
-                <input type="text" required placeholder="Ej: 1939" style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: '#fff' }} value={historyYear} onChange={e => setHistoryYear(e.target.value)} />
+          <form onSubmit={handleHistorySubmit} className="admin-form">
+            <div className="form-row">
+              <div className="form-group" style={{ flex: '0 0 150px' }}>
+                <label>Año</label>
+                <input type="text" required placeholder="Ej: 1939" value={historyYear} onChange={e => setHistoryYear(e.target.value)} />
               </div>
-              <div>
-                <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.4rem' }}>Título del Suceso</label>
-                <input type="text" required style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: '#fff' }} value={historyTitle} onChange={e => setHistoryTitle(e.target.value)} />
+              <div className="form-group">
+                <label>Título del Suceso</label>
+                <input type="text" required value={historyTitle} onChange={e => setHistoryTitle(e.target.value)} />
               </div>
             </div>
-            <div>
-              <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.4rem' }}>Descripción Detallada</label>
-              <textarea rows="4" required style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: '#fff', resize: 'vertical' }} value={historyDesc} onChange={e => setHistoryDesc(e.target.value)}></textarea>
+            <div className="form-group">
+              <label>Descripción Detallada</label>
+              <textarea rows="4" required value={historyDesc} onChange={e => setHistoryDesc(e.target.value)}></textarea>
             </div>
-            <button type="submit" className="btn" style={{ background: 'var(--primary)', color: 'white', padding: '0.85rem' }}>
+            <button type="submit" className="btn-submit">
               {editingHistoryId !== null ? 'Guardar Cambios' : 'Registrar Hito Histórico'}
             </button>
           </form>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {historyEvents.map((h, idx) => (
-              <div key={idx} className="card" style={{ padding: '1.5rem', borderLeft: '5px solid var(--primary)' }}>
+            {historyEvents.map((h) => (
+              <div key={h.id} className="card" style={{ padding: '1.5rem', borderLeft: '5px solid var(--primary)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div>
                     <span style={{ background: 'var(--primary)', color: 'white', padding: '2px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold' }}>{h.año}</span>
@@ -653,42 +686,50 @@ export default function AdminPanel() {
         <section>
           <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1.5rem', color: 'var(--primary)' }}>Gestión de Sedes Institucionales</h3>
           
-          {editingSedeId !== null ? (
-            <form onSubmit={handleSedeSubmit} className="card" style={{ padding: '2.5rem 2rem', marginBottom: '3rem', display: 'flex', flexDirection: 'column', gap: '1.25rem', border: '2px solid var(--accent)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h4 style={{ color: 'var(--primary)' }}>Modificando Sede</h4>
-              <button type="button" onClick={() => setEditingSedeId(null)} className="btn" style={{ background: 'var(--muted)', padding: '0.4rem 0.8rem' }}>Cancelar</button>
+          <form onSubmit={handleSedeSubmit} className="admin-form" style={{ border: '2px solid var(--accent)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+              <div>
+                <h4 style={{ color: 'var(--primary)', margin: 0 }}>{editingSedeId !== null ? 'Modificando Sede' : 'Agregar Nueva Sede'}</h4>
+                <p style={{ margin: '0.5rem 0 0', color: 'var(--muted-fg)' }}>
+                  {editingSedeId !== null ? 'Edita los datos de la sede seleccionada y guarda los cambios.' : 'Completa el formulario para añadir una nueva sede institucional.'}
+                </p>
+              </div>
+              {editingSedeId !== null && (
+                <button type="button" onClick={() => {
+                  setEditingSedeId(null);
+                  setSedeForm({ name: '', tipo: 'Urbana', location: '', students: '', img: '', desc: '', salones: '', cancha: false, informatica: false, extras: '' });
+                }} className="btn" style={{ background: 'var(--muted)', padding: '0.4rem 0.8rem' }}>
+                  Cancelar edición
+                </button>
+              )}
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-              <input type="text" placeholder="Nombre de la Sede" required style={{ padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)' }} value={sedeForm.name} onChange={e => setSedeForm({...sedeForm, name: e.target.value})} />
-              <select style={{ padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)' }} value={sedeForm.tipo} onChange={e => setSedeForm({...sedeForm, tipo: e.target.value})}>
+            <div className="form-row">
+              <input type="text" placeholder="Nombre de la Sede" required value={sedeForm.name} onChange={e => setSedeForm({...sedeForm, name: e.target.value})} />
+              <select value={sedeForm.tipo} onChange={e => setSedeForm({...sedeForm, tipo: e.target.value})}>
                 <option value="Urbana">Urbana</option>
                 <option value="Rural">Rural</option>
               </select>
             </div>
-            <input type="text" placeholder="Ubicación" required style={{ padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)' }} value={sedeForm.location} onChange={e => setSedeForm({...sedeForm, location: e.target.value})} />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-              <input type="number" placeholder="Cantidad estudiantes" required style={{ padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)' }} value={sedeForm.students} onChange={e => setSedeForm({...sedeForm, students: e.target.value})} />
-              <input type="url" placeholder="URL Imagen de la Sede" required style={{ padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)' }} value={sedeForm.img} onChange={e => setSedeForm({...sedeForm, img: e.target.value})} />
+            <input type="text" placeholder="Ubicación" required value={sedeForm.location} onChange={e => setSedeForm({...sedeForm, location: e.target.value})} />
+            <div className="form-row">
+              <input type="number" placeholder="Cantidad estudiantes" required value={sedeForm.students} onChange={e => setSedeForm({...sedeForm, students: e.target.value})} />
+              <input type="url" placeholder="URL Imagen de la Sede" required value={sedeForm.img} onChange={e => setSedeForm({...sedeForm, img: e.target.value})} />
             </div>
-            <textarea placeholder="Descripción detallada" rows="3" required style={{ padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)' }} value={sedeForm.desc} onChange={e => setSedeForm({...sedeForm, desc: e.target.value})}></textarea>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', alignItems: 'center' }}>
-              <input type="number" placeholder="N° Salones" style={{ padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)' }} value={sedeForm.salones} onChange={e => setSedeForm({...sedeForm, salones: e.target.value})} />
-              <label><input type="checkbox" checked={sedeForm.cancha} onChange={e => setSedeForm({...sedeForm, cancha: e.target.checked})} /> Cancha</label>
-              <label><input type="checkbox" checked={sedeForm.informatica} onChange={e => setSedeForm({...sedeForm, informatica: e.target.checked})} /> Informática</label>
+            <textarea placeholder="Descripción detallada" rows="3" required value={sedeForm.desc} onChange={e => setSedeForm({...sedeForm, desc: e.target.value})}></textarea>
+            <div className="form-row" style={{ alignItems: 'center' }}>
+              <input type="number" placeholder="N° Salones" value={sedeForm.salones} onChange={e => setSedeForm({...sedeForm, salones: e.target.value})} />
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}><input type="checkbox" checked={sedeForm.cancha} onChange={e => setSedeForm({...sedeForm, cancha: e.target.checked})} /> Cancha</label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}><input type="checkbox" checked={sedeForm.informatica} onChange={e => setSedeForm({...sedeForm, informatica: e.target.checked})} /> Informática</label>
             </div>
-            <input type="text" placeholder="Extras (separados por coma: Biblioteca, Comedor, etc.)" style={{ padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)' }} value={sedeForm.extras} onChange={e => setSedeForm({...sedeForm, extras: e.target.value})} />
-            <button type="submit" className="btn" style={{ background: 'var(--primary)', color: 'white' }}>
-              Guardar Cambios en la Sede
+            <input type="text" placeholder="Extras (separados por coma: Biblioteca, Comedor, etc.)" value={sedeForm.extras} onChange={e => setSedeForm({...sedeForm, extras: e.target.value})} />
+            <button type="submit" className="btn-submit">
+              {editingSedeId !== null ? 'Guardar Cambios en la Sede' : 'Agregar Sede'}
             </button>
           </form>
-          ) : (
-            <p style={{ marginBottom: '2rem', color: 'var(--muted-fg)' }}>Selecciona una sede del listado inferior para actualizar su información.</p>
-          )}
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
-            {sedes.map((s, idx) => (
-              <div key={idx} className="card" style={{ padding: '1rem' }}>
+            {sedes.map((s) => (
+              <div key={s.id} className="card" style={{ padding: '1rem' }}>
                 <img src={s.img} alt={s.name} style={{ width: '100%', height: '120px', objectFit: 'cover', borderRadius: '0.5rem' }} />
                 <h4 style={{ margin: '0.5rem 0' }}>{s.name}</h4>
                 <p style={{ fontSize: '0.8rem', color: 'var(--muted-fg)' }}>{s.location} | {s.students} Est.</p>
@@ -776,8 +817,8 @@ export default function AdminPanel() {
           </form>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {transparenciaDocs.map((d, idx) => (
-              <div key={idx} className="card" style={{ padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            {transparenciaDocs.map((d) => (
+              <div key={d.id} className="card" style={{ padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                   <h4 style={{ margin: 0, color: 'var(--foreground)' }}>{d.name}</h4>
                   <span style={{ fontSize: '0.8rem', color: 'var(--muted-fg)' }}>{d.size} · <a href={d.url} target="_blank" rel="noreferrer" style={{ color: 'var(--accent)', textDecoration: 'underline' }}>Ver archivo</a></span>
@@ -818,8 +859,8 @@ export default function AdminPanel() {
             </button>
           </form>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
-            {honorStudents.map((s, idx) => (
-              <div key={idx} className="card" style={{ padding: '1rem', textAlign: 'center' }}>
+            {honorStudents.map((s) => (
+              <div key={s.id} className="card" style={{ padding: '1rem', textAlign: 'center' }}>
                 <img src={s.photo} alt={s.name} style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 0.5rem' }} />
                 <h4 style={{ color: 'var(--primary)', margin: 0 }}>{s.name}</h4>
                 <p style={{ fontSize: '0.8rem', color: 'var(--muted-fg)', margin: '0.2rem 0' }}>{s.achievement}</p>
