@@ -21,6 +21,7 @@ import Header from './components/Header.jsx'
 import Footer from './components/Footer.jsx'
 import HistoriaSection from './components/HistoriaSection.jsx'
 import GaleriaPages from './pages/GaleriaPages.jsx'
+import PrivateRoute from './components/PrivateRoute.jsx'
 
 function App() {
   // 1. Estado para el Modo Oscuro
@@ -60,7 +61,7 @@ function App() {
           <Route path="/galeria-completa" element={<GaleriaPages />} />
 
           {/* RUTAS DE ADMINISTRACIÓN Y CUADRO DE HONOR */}
-          <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/admin" element={<PrivateRoute><AdminPanel /></PrivateRoute>} />
           <Route path="/cuadro-de-honor" element={<CuadroDeHonorPages />} />
           <Route path="/horas-constitucionales" element={<HorasConstitucionalesPages />} />
 

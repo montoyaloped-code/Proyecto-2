@@ -275,7 +275,7 @@ export default function AdminPanel() {
     const payload = { año: historyYear.trim(), titulo: historyTitle.trim(), desc: historyDesc.trim() };
 
     let operation;
-    if (editingHistoryId) {
+    if (editingHistoryId !== null) {
       operation = supabase.from('historia').update(payload).eq('id', editingHistoryId);
     } else {
       operation = supabase.from('historia').insert([payload]);
@@ -285,6 +285,7 @@ export default function AdminPanel() {
       console.error("Error saving history event:", error);
     } else {
       setHistoryYear(''); setHistoryTitle(''); setHistoryDesc('');
+      setEditingHistoryId(null);
       fetchHistory();
     }
   };
@@ -656,9 +657,21 @@ export default function AdminPanel() {
               <label>Descripción Detallada</label>
               <textarea rows="4" required value={historyDesc} onChange={e => setHistoryDesc(e.target.value)}></textarea>
             </div>
-            <button type="submit" className="btn-submit">
-              {editingHistoryId !== null ? 'Guardar Cambios' : 'Registrar Hito Histórico'}
-            </button>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+              <button type="submit" className="btn-submit">
+                {editingHistoryId !== null ? 'Guardar Cambios' : 'Registrar Hito Histórico'}
+              </button>
+              {editingHistoryId !== null && (
+                <button type="button" className="btn" style={{ background: 'var(--muted)', color: 'var(--foreground)' }} onClick={() => {
+                  setEditingHistoryId(null);
+                  setHistoryYear('');
+                  setHistoryTitle('');
+                  setHistoryDesc('');
+                }}>
+                  Cancelar edición
+                </button>
+              )}
+            </div>
           </form>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -736,11 +749,21 @@ export default function AdminPanel() {
                 <div style={{ marginTop: '1rem' }}>
                   <button onClick={(e) => {
                     window.scrollTo({ top: 400, behavior: 'smooth' });
+                    const infra = s?.infra || {};
+                    const descValue = Array.isArray(s?.description) ? s.description[0] : (typeof s?.description === 'string' ? s.description : '');
+                    const extrasValue = Array.isArray(infra.extras) ? infra.extras.join(', ') : (typeof infra.extras === 'string' ? infra.extras : '');
                     setEditingSedeId(s.id);
                     setSedeForm({
-                      name: s.name, tipo: s.tipo, location: s.location, students: s.students, img: s.img,
-                      desc: s.description ? s.description[0] : '', salones: s.infra.salones, cancha: s.infra.cancha,
-                      informatica: s.infra.informatica, extras: s.infra.extras ? s.infra.extras.join(', ') : ''
+                      name: s?.name || '',
+                      tipo: s?.tipo || 'Urbana',
+                      location: s?.location || '',
+                      students: s?.students ?? '',
+                      img: s?.img || '',
+                      desc: descValue,
+                      salones: infra?.salones ?? '',
+                      cancha: infra?.cancha ?? false,
+                      informatica: infra?.informatica ?? false,
+                      extras: extrasValue
                     });
                   }} className="btn" style={{ padding: '0.6rem', fontSize: '0.9rem', width: '100%', background: 'var(--primary)', color: 'white' }}>Gestionar Contenido</button>
                 </div>
