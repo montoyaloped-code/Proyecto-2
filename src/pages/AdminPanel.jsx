@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
-import '../App.css'; // Import global styles
+import { useImageUpload } from '../hooks/useImageUpload';
+import { Menu, X } from 'lucide-react';
+import '../App.css';
 
 export default function AdminPanel() {
-  const [activeTab, setActiveTab] = useState('directivos'); // 'directivos', 'docentes', 'galeria', 'cuadro-honor', 'constitucion', 'historia', 'psicologia', 'transparencia', 'sedes'
+  const [activeTab, setActiveTab] = useState('directivos');
   const [loading, setLoading] = useState(true);
 
-  // --- Admin Menu State & Logic ---
   const [adminMobileMenuOpen, setAdminMobileMenuOpen] = useState(false);
 
   const toggleAdminMobileMenu = () => {
@@ -18,12 +19,15 @@ export default function AdminPanel() {
     setAdminMobileMenuOpen(false);
   };
 
+  const { uploadImage, uploading } = useImageUpload();
+
   // --- Docentes State & Logic ---
   const [docentes, setDocentes] = useState([]);
   const [nombreDocente, setNombreDocente] = useState('');
   const [areaDocente, setAreaDocente] = useState('');
   const [cargoDocente, setCargoDocente] = useState('Docente de Aula');
   const [fotoDocente, setFotoDocente] = useState('');
+  const [fotoDocenteFile, setFotoDocenteFile] = useState(null);
   const [editingDocenteId, setEditingDocenteId] = useState(null);
 
   const AREAS_ESTATICAS = [
@@ -31,6 +35,137 @@ export default function AdminPanel() {
     "Educación Ética", "Educación Física", "Humanidades (Español e Inglés)",
     "Matemáticas", "Tecnología e Informática", "Religión"
   ];
+
+  // --- Galería State & Logic ---
+  const [galleryImages, setGalleryImages] = useState([]);
+  const [imageUrl, setImageUrl] = useState('');
+  const [imageAlt, setImageAlt] = useState('');
+  const [isLarge, setIsLarge] = useState(false);
+  const [editingImageId, setEditingImageId] = useState(null);
+
+  // --- Cuadro de Honor State & Logic ---
+  const [honorStudents, setHonorStudents] = useState([]);
+  const [studentPhoto, setStudentPhoto] = useState('');
+  const [studentPhotoFile, setStudentPhotoFile] = useState(null);
+  const [studentName, setStudentName] = useState('');
+  const [studentAchievement, setStudentAchievement] = useState('');
+  const [studentSubject, setStudentSubject] = useState('');
+  const [editingStudentId, setEditingStudentId] = useState(null);
+
+  // --- Directivos State & Logic ---
+  const [directivos, setDirectivos] = useState([]);
+  const [nombreDirectivo, setNombreDirectivo] = useState('');
+  const [cargoDirectivo, setCargoDirectivo] = useState('');
+  const [editingDirectivoId, setEditingDirectivoId] = useState(null);
+
+  const CARGOS_DIRECTIVOS = ["Rector", "Coordinador Académico", "Coordinador de Convivencia", "Secretario(a)"];
+
+  // --- Historia State & Logic ---
+  const [historyEvents, setHistoryEvents] = useState([]);
+  const [historyYear, setHistoryYear] = useState('');
+  const [historyTitle, setHistoryTitle] = useState('');
+  const [historyDesc, setHistoryDesc] = useState('');
+  const [editingHistoryId, setEditingHistoryId] = useState(null);
+
+  // --- Salud Mental (Psicología) State & Logic ---
+  const [psicologiaTemas, setPsicologiaTemas] = useState([]);
+  const [psicIcon, setPsicIcon] = useState('');
+  const [psicTitle, setPsicTitle] = useState('');
+  const [psicShort, setPsicShort] = useState('');
+  const [psicDetails, setPsicDetails] = useState('');
+  const [editingPsicId, setEditingPsicId] = useState(null);
+
+  // --- Transparencia (Ley 1712) State & Logic ---
+  const [transparenciaDocs, setTransparenciaDocs] = useState([]);
+  const [docName, setDocName] = useState('');
+  const [docSize, setDocSize] = useState('');
+  const [docUrl, setDocUrl] = useState('');
+  const [editingDocId, setEditingDocId] = useState(null);
+
+  // --- Sedes State & Logic ---
+  const [sedes, setSedes] = useState([]);
+  const [sedeForm, setSedeForm] = useState({
+    name: '', tipo: 'Urbana', location: '', students: '', img: '', desc: '', salones: '', cancha: false, informatica: false, extras: ''
+  });
+  const [editingSedeId, setEditingSedeId] = useState(null);
+  const [sedeImgFile, setSedeImgFile] = useState(null);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  // ===================== FETCH FUNCTIONS =====================
+
+  const fetchDocentes = async () => {
+    const { data, error } = await supabase.from('docentes').select('*').order('nombre');
+    if (error) {
+      console.error("Error fetching docentes:", error);
+    } else {
+      setDocentes(data || []);
+    }
+  };
+
+  const fetchGallery = async () => {
+    const { data, error } = await supabase.from('galeria').select('*').order('created_at', { ascending: false });
+    if (error) {
+      console.error("Error fetching gallery images:", error);
+    } else {
+      setGalleryImages(data || []);
+    }
+  };
+
+  const fetchHonorStudents = async () => {
+    const { data, error } = await supabase.from('cuadro_honor').select('*');
+    if (error) {
+      console.error("Error fetching honor students:", error);
+    } else {
+      setHonorStudents(data || []);
+    }
+  };
+
+  const fetchDirectivos = async () => {
+    const { data, error } = await supabase.from('directivos').select('*');
+    if (error) {
+      console.error("Error fetching directivos:", error);
+    } else {
+      setDirectivos(data || []);
+    }
+  };
+
+  const fetchHistory = async () => {
+    const { data, error } = await supabase.from('historia').select('*').order('año');
+    if (error) {
+      console.error("Error fetching history events:", error);
+    } else {
+      setHistoryEvents(data || []);
+    }
+  };
+
+  const fetchPsicologia = async () => {
+    const { data, error } = await supabase.from('psicologia').select('*');
+    if (error) {
+      console.error("Error fetching psicologia themes:", error);
+    } else {
+      setPsicologiaTemas(data || []);
+    }
+  };
+
+  const fetchTransparencia = async () => {
+    const { data, error } = await supabase.from('transparencia').select('*');
+    if (error) {
+      console.error("Error fetching transparencia documents:", error);
+    } else {
+      setTransparenciaDocs(data || []);
+    }
+  };
+
+  const fetchSedes = async () => {
+    const { data, error } = await supabase.from('sedes').select('*');
+    if (error) {
+      console.error("Error fetching sedes:", error);
+    } else {
+      setSedes(data || []);
+    }
+  };
+
+  // ===================== INIT =====================
 
   useEffect(() => {
     const loadInitialData = async () => {
@@ -49,28 +184,40 @@ export default function AdminPanel() {
     loadInitialData();
   }, []);
 
-  const fetchDocentes = async () => {
-    const { data, error } = await supabase.from('docentes').select('*').order('nombre');
-    if (error) {
-      console.error("Error fetching docentes:", error);
-    } else {
-      setDocentes(data || []);
-    }
-  };
+  // ===================== DOCENTES CRUD =====================
 
   const handleDocenteSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage('');
     if (!areaDocente || !nombreDocente.trim()) return alert("Por favor, completa el nombre y selecciona un área académica.");
-    const payload = { nombre: nombreDocente.trim(), area: areaDocente, cargo: cargoDocente.trim(), foto: fotoDocente.trim() };
 
-    if (editingDocenteId) {
-      await supabase.from('docentes').update(payload).eq('id', editingDocenteId);
-      setEditingDocenteId(null);
-    } else {
-      await supabase.from('docentes').insert([payload]);
+    let fotoUrl = fotoDocente.trim();
+    if (fotoDocenteFile) {
+      try {
+        fotoUrl = await uploadImage(fotoDocenteFile, 'docentes');
+      } catch (err) {
+        console.error("Error uploading image:", err);
+        setErrorMessage("Error al subir la imagen. Intenta de nuevo.");
+        return;
+      }
     }
-    setNombreDocente(''); setAreaDocente(''); setCargoDocente('Docente de Aula'); setFotoDocente('');
-    fetchDocentes();
+
+    const payload = { nombre: nombreDocente.trim(), area: areaDocente, cargo: cargoDocente.trim(), foto: fotoUrl };
+
+    try {
+      if (editingDocenteId) {
+        await supabase.from('docentes').update(payload).eq('id', editingDocenteId);
+        setEditingDocenteId(null);
+      } else {
+        await supabase.from('docentes').insert([payload]);
+      }
+      setNombreDocente(''); setAreaDocente(''); setCargoDocente('Docente de Aula');
+      setFotoDocente(''); setFotoDocenteFile(null);
+      fetchDocentes();
+    } catch (err) {
+      console.error("Error saving docente:", err);
+      setErrorMessage("Error al guardar el docente. Revisa la conexión e intenta de nuevo.");
+    }
   };
 
   const startEditDocente = (docente) => {
@@ -79,52 +226,46 @@ export default function AdminPanel() {
     setAreaDocente(docente.area);
     setCargoDocente(docente.cargo);
     setFotoDocente(docente.foto || '');
+    setFotoDocenteFile(null);
   };
 
   const deleteDocente = async (id) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar a este docente?')) {
-      const { error } = await supabase.from('docentes').delete().eq('id', id);
-      if (error) {
-        console.error("Error deleting docente:", error);
-      } else {
+      setErrorMessage('');
+      try {
+        const { error } = await supabase.from('docentes').delete().eq('id', id);
+        if (error) throw error;
         fetchDocentes();
+      } catch (err) {
+        console.error("Error deleting docente:", err);
+        setErrorMessage("Error al eliminar el docente. Intenta de nuevo.");
       }
     }
   };
 
-  // --- Galería State & Logic ---
-  const [galleryImages, setGalleryImages] = useState([]);
-  const [imageUrl, setImageUrl] = useState('');
-  const [imageAlt, setImageAlt] = useState('');
-  const [isLarge, setIsLarge] = useState(false);
-  const [editingImageId, setEditingImageId] = useState(null);
-
-  const fetchGallery = async () => {
-    const { data, error } = await supabase.from('galeria').select('*').order('created_at', { ascending: false });
-    if (error) {
-      console.error("Error fetching gallery images:", error);
-    } else {
-      setGalleryImages(data || []);
-    }
-  };
+  // ===================== GALERÍA CRUD =====================
 
   const handleImageSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage('');
     if (!imageUrl.trim() || !imageAlt.trim()) return alert("Por favor, ingresa la URL y el texto alternativo de la imagen.");
     const payload = { thumb: imageUrl.trim(), full: imageUrl.trim(), alt: imageAlt.trim(), large: isLarge };
 
-    let operation;
-    if (editingImageId) {
-      operation = supabase.from('galeria').update(payload).eq('id', editingImageId);
-    } else {
-      operation = supabase.from('galeria').insert([payload]);
-    }
-    const { error } = await operation;
-    if (error) {
-      console.error("Error saving image:", error);
-    } else {
+    try {
+      let operation;
+      if (editingImageId) {
+        operation = supabase.from('galeria').update(payload).eq('id', editingImageId);
+      } else {
+        operation = supabase.from('galeria').insert([payload]);
+      }
+      const { error } = await operation;
+      if (error) throw error;
       setImageUrl(''); setImageAlt(''); setIsLarge(false);
+      setEditingImageId(null);
       fetchGallery();
+    } catch (err) {
+      console.error("Error saving image:", err);
+      setErrorMessage("Error al guardar la imagen. Intenta de nuevo.");
     }
   };
 
@@ -137,57 +278,65 @@ export default function AdminPanel() {
 
   const deleteImage = async (id) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar esta imagen?')) {
-      const { error } = await supabase.from('galeria').delete().eq('id', id);
-      if (error) {
-        console.error("Error deleting image:", error);
-      } else {
+      setErrorMessage('');
+      try {
+        const { error } = await supabase.from('galeria').delete().eq('id', id);
+        if (error) throw error;
         fetchGallery();
+      } catch (err) {
+        console.error("Error deleting image:", err);
+        setErrorMessage("Error al eliminar la imagen. Intenta de nuevo.");
       }
     }
   };
 
-  // --- Cuadro de Honor State & Logic ---
-  const [honorStudents, setHonorStudents] = useState([]);
-  const [studentPhoto, setStudentPhoto] = useState('');
-  const [studentName, setStudentName] = useState('');
-  const [studentAchievement, setStudentAchievement] = useState('');
-  const [studentSubject, setStudentSubject] = useState('');
-  const [editingStudentId, setEditingStudentId] = useState(null);
-
-  const fetchHonorStudents = async () => {
-    const { data, error } = await supabase.from('cuadro_honor').select('*');
-    if (error) {
-      console.error("Error fetching honor students:", error);
-    } else {
-      setHonorStudents(data || []);
-    }
-  };
+  // ===================== CUADRO DE HONOR CRUD =====================
 
   const handleStudentSubmit = async (e) => {
     e.preventDefault();
-    if (!studentPhoto.trim() || !studentName.trim() || !studentAchievement.trim() || !studentSubject.trim()) {
+    setErrorMessage('');
+    if (!studentName.trim() || !studentAchievement.trim() || !studentSubject.trim()) {
       return alert("Por favor, completa todos los campos del estudiante.");
     }
-    const payload = { photo: studentPhoto.trim(), name: studentName.trim(), achievement: studentAchievement.trim(), subject: studentSubject.trim() };
-    
-    let operation;
-    if (editingStudentId) {
-      operation = supabase.from('cuadro_honor').update(payload).eq('id', editingStudentId);
-    } else {
-      operation = supabase.from('cuadro_honor').insert([payload]);
+
+    let photoUrl = studentPhoto.trim();
+    if (studentPhotoFile) {
+      try {
+        photoUrl = await uploadImage(studentPhotoFile, 'cuadro-honor');
+      } catch (err) {
+        console.error("Error uploading image:", err);
+        setErrorMessage("Error al subir la foto. Intenta de nuevo.");
+        return;
+      }
+    } else if (!photoUrl) {
+      return alert("Debes seleccionar una foto o proporcionar una URL.");
     }
-    const { error } = await operation;
-    if (error) {
-      console.error("Error saving honor student:", error);
-    } else {
-      setStudentPhoto(''); setStudentName(''); setStudentAchievement(''); setStudentSubject('');
+
+    const payload = { photo: photoUrl, name: studentName.trim(), achievement: studentAchievement.trim(), subject: studentSubject.trim() };
+
+    try {
+      let operation;
+      if (editingStudentId) {
+        operation = supabase.from('cuadro_honor').update(payload).eq('id', editingStudentId);
+      } else {
+        operation = supabase.from('cuadro_honor').insert([payload]);
+      }
+      const { error } = await operation;
+      if (error) throw error;
+      setStudentPhoto(''); setStudentPhotoFile(null);
+      setStudentName(''); setStudentAchievement(''); setStudentSubject('');
+      setEditingStudentId(null);
       fetchHonorStudents();
+    } catch (err) {
+      console.error("Error saving honor student:", err);
+      setErrorMessage("Error al guardar el estudiante. Intenta de nuevo.");
     }
   };
 
   const startEditStudent = (student) => {
     setEditingStudentId(student.id);
     setStudentPhoto(student.photo);
+    setStudentPhotoFile(null);
     setStudentName(student.name);
     setStudentAchievement(student.achievement);
     setStudentSubject(student.subject);
@@ -195,219 +344,201 @@ export default function AdminPanel() {
 
   const deleteStudent = async (id) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar a este estudiante del Cuadro de Honor?')) {
-      const { error } = await supabase.from('cuadro_honor').delete().eq('id', id);
-      if (error) {
-        console.error("Error deleting honor student:", error);
-      } else {
+      setErrorMessage('');
+      try {
+        const { error } = await supabase.from('cuadro_honor').delete().eq('id', id);
+        if (error) throw error;
         fetchHonorStudents();
+      } catch (err) {
+        console.error("Error deleting honor student:", err);
+        setErrorMessage("Error al eliminar el estudiante. Intenta de nuevo.");
       }
     }
   };
 
-  // --- Directivos State & Logic ---
-  const [directivos, setDirectivos] = useState([]);
-  const [nombreDirectivo, setNombreDirectivo] = useState('');
-  const [cargoDirectivo, setCargoDirectivo] = useState('');
-  const [editingDirectivoId, setEditingDirectivoId] = useState(null);
-
-  const CARGOS_DIRECTIVOS = ["Rector", "Coordinador Académico", "Coordinador de Convivencia", "Secretario(a)"];
-
-  const fetchDirectivos = async () => {
-    const { data, error } = await supabase.from('directivos').select('*');
-    if (error) {
-      console.error("Error fetching directivos:", error);
-    } else {
-      setDirectivos(data || []);
-    }
-  };
+  // ===================== DIRECTIVOS CRUD =====================
 
   const handleDirectivoSubmit = async (e) => {
     e.preventDefault();
-    
+    setErrorMessage('');
+
     if (!nombreDirectivo.trim() || !cargoDirectivo) return alert("Por favor, completa el nombre y selecciona un cargo.");
     const payload = { nombre: nombreDirectivo.trim(), cargo: cargoDirectivo };
 
-    let error;
-    if (editingDirectivoId) {
-      const res = await supabase.from('directivos').update(payload).eq('id', editingDirectivoId);
-      error = res.error;
+    try {
+      let error;
+      if (editingDirectivoId) {
+        const res = await supabase.from('directivos').update(payload).eq('id', editingDirectivoId);
+        error = res.error;
+      } else {
+        const res = await supabase.from('directivos').insert([payload]);
+        error = res.error;
+      }
+      if (error) throw error;
       setEditingDirectivoId(null);
-    } else {
-      const res = await supabase.from('directivos').insert([payload]);
-      error = res.error;
-    }
-
-    if (error) {
-      console.error("Error saving directivo:", error);
-    } else {
       setNombreDirectivo(''); setCargoDirectivo('');
       fetchDirectivos();
+    } catch (err) {
+      console.error("Error saving directivo:", err);
+      setErrorMessage("Error al guardar el directivo. Intenta de nuevo.");
     }
   };
 
   const deleteDirectivo = async (id) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar a este directivo?')) {
-      await supabase.from('directivos').delete().eq('id', id);
-      fetchDirectivos();
+      setErrorMessage('');
+      try {
+        const { error } = await supabase.from('directivos').delete().eq('id', id);
+        if (error) throw error;
+        fetchDirectivos();
+      } catch (err) {
+        console.error("Error deleting directivo:", err);
+        setErrorMessage("Error al eliminar el directivo. Intenta de nuevo.");
+      }
     }
   };
 
-  // --- Historia State & Logic ---
-  const [historyEvents, setHistoryEvents] = useState([]);
-  const [historyYear, setHistoryYear] = useState('');
-  const [historyTitle, setHistoryTitle] = useState('');
-  const [historyDesc, setHistoryDesc] = useState('');
-  const [editingHistoryId, setEditingHistoryId] = useState(null);
-
-  const fetchHistory = async () => {
-    // Nota: Si cambias el nombre de la columna en la DB a 'anio', actualiza esto aquí.
-    const { data, error } = await supabase.from('historia').select('*').order('año');
-    if (error) {
-      console.error("Error fetching history events:", error);
-    } else {
-      setHistoryEvents(data || []);
-    }
-  };
+  // ===================== HISTORIA CRUD =====================
 
   const handleHistorySubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage('');
     if (!historyYear.trim() || !historyTitle.trim() || !historyDesc.trim()) return alert("Completa todos los campos.");
     const payload = { año: historyYear.trim(), titulo: historyTitle.trim(), desc: historyDesc.trim() };
 
-    let operation;
-    if (editingHistoryId !== null) {
-      operation = supabase.from('historia').update(payload).eq('id', editingHistoryId);
-    } else {
-      operation = supabase.from('historia').insert([payload]);
-    }
-    const { error } = await operation;
-    if (error) {
-      console.error("Error saving history event:", error);
-    } else {
+    try {
+      let operation;
+      if (editingHistoryId !== null) {
+        operation = supabase.from('historia').update(payload).eq('id', editingHistoryId);
+      } else {
+        operation = supabase.from('historia').insert([payload]);
+      }
+      const { error } = await operation;
+      if (error) throw error;
       setHistoryYear(''); setHistoryTitle(''); setHistoryDesc('');
       setEditingHistoryId(null);
       fetchHistory();
+    } catch (err) {
+      console.error("Error saving history event:", err);
+      setErrorMessage("Error al guardar el evento histórico. Intenta de nuevo.");
     }
   };
 
   const deleteHistory = async (id) => {
     if (window.confirm('¿Eliminar este evento histórico?')) {
-      await supabase.from('historia').delete().eq('id', id);
-      fetchHistory();
+      setErrorMessage('');
+      try {
+        const { error } = await supabase.from('historia').delete().eq('id', id);
+        if (error) throw error;
+        fetchHistory();
+      } catch (err) {
+        console.error("Error deleting history event:", err);
+        setErrorMessage("Error al eliminar el evento. Intenta de nuevo.");
+      }
     }
   };
 
-  // --- Salud Mental (Psicología) State & Logic ---
-  const [psicologiaTemas, setPsicologiaTemas] = useState([]);
-  const [psicIcon, setPsicIcon] = useState('');
-  const [psicTitle, setPsicTitle] = useState('');
-  const [psicShort, setPsicShort] = useState('');
-  const [psicDetails, setPsicDetails] = useState('');
-  const [editingPsicId, setEditingPsicId] = useState(null);
-
-  const fetchPsicologia = async () => {
-    const { data, error } = await supabase.from('psicologia').select('*');
-    if (error) {
-      console.error("Error fetching psicologia themes:", error);
-    } else {
-      setPsicologiaTemas(data || []);
-    }
-  };
+  // ===================== PSICOLOGÍA CRUD =====================
 
   const handlePsicSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage('');
     if (!psicIcon.trim() || !psicTitle.trim() || !psicShort.trim() || !psicDetails.trim()) return alert("Completa todos los campos.");
     const payload = { icon: psicIcon.trim(), title: psicTitle.trim(), short: psicShort.trim(), details: psicDetails.trim() };
 
-    let operation;
-    if (editingPsicId) {
-      operation = supabase.from('psicologia').update(payload).eq('id', editingPsicId);
-    } else {
-      operation = supabase.from('psicologia').insert([payload]);
-    }
-    const { error } = await operation;
-    if (error) {
-      console.error("Error saving psicologia theme:", error);
-    } else {
+    try {
+      let operation;
+      if (editingPsicId) {
+        operation = supabase.from('psicologia').update(payload).eq('id', editingPsicId);
+      } else {
+        operation = supabase.from('psicologia').insert([payload]);
+      }
+      const { error } = await operation;
+      if (error) throw error;
       setPsicIcon(''); setPsicTitle(''); setPsicShort(''); setPsicDetails('');
+      setEditingPsicId(null);
       fetchPsicologia();
+    } catch (err) {
+      console.error("Error saving psicologia theme:", err);
+      setErrorMessage("Error al guardar el tema de salud mental. Intenta de nuevo.");
     }
   };
 
   const deletePsic = async (id) => {
     if (window.confirm('¿Eliminar este tema de salud mental?')) {
-      await supabase.from('psicologia').delete().eq('id', id);
-      fetchPsicologia();
+      setErrorMessage('');
+      try {
+        const { error } = await supabase.from('psicologia').delete().eq('id', id);
+        if (error) throw error;
+        fetchPsicologia();
+      } catch (err) {
+        console.error("Error deleting psicologia theme:", err);
+        setErrorMessage("Error al eliminar el tema. Intenta de nuevo.");
+      }
     }
   };
 
-  // --- Transparencia (Ley 1712) State & Logic ---
-  const [transparenciaDocs, setTransparenciaDocs] = useState([]);
-  const [docName, setDocName] = useState('');
-  const [docSize, setDocSize] = useState('');
-  const [docUrl, setDocUrl] = useState('');
-  const [editingDocId, setEditingDocId] = useState(null);
-
-  const fetchTransparencia = async () => {
-    const { data, error } = await supabase.from('transparencia').select('*');
-    if (error) {
-      console.error("Error fetching transparencia documents:", error);
-    } else {
-      setTransparenciaDocs(data || []);
-    }
-  };
+  // ===================== TRANSPARENCIA CRUD =====================
 
   const handleDocSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage('');
     if (!docName.trim() || !docSize.trim() || !docUrl.trim()) return alert("Completa todos los campos.");
     const payload = { name: docName.trim(), size: docSize.trim(), url: docUrl.trim() };
 
-    const { error } = editingDocId 
-      ? await supabase.from('transparencia').update(payload).eq('id', editingDocId)
-      : await supabase.from('transparencia').insert([payload]);
-
-    if (error) {
-      console.error("Error saving document:", error);
-    } else {
+    try {
+      const { error } = editingDocId
+        ? await supabase.from('transparencia').update(payload).eq('id', editingDocId)
+        : await supabase.from('transparencia').insert([payload]);
+      if (error) throw error;
       setEditingDocId(null);
       setDocName(''); setDocSize(''); setDocUrl('');
       fetchTransparencia();
+    } catch (err) {
+      console.error("Error saving document:", err);
+      setErrorMessage("Error al guardar el documento. Intenta de nuevo.");
     }
   };
 
   const deleteDoc = async (id) => {
     if (window.confirm('¿Eliminar este documento de transparencia?')) {
-      await supabase.from('transparencia').delete().eq('id', id);
-      fetchTransparencia();
+      setErrorMessage('');
+      try {
+        const { error } = await supabase.from('transparencia').delete().eq('id', id);
+        if (error) throw error;
+        fetchTransparencia();
+      } catch (err) {
+        console.error("Error deleting document:", err);
+        setErrorMessage("Error al eliminar el documento. Intenta de nuevo.");
+      }
     }
   };
 
-  const [sedes, setSedes] = useState([]);
-
-  const [sedeForm, setSedeForm] = useState({
-    name: '', tipo: 'Urbana', location: '', students: '', img: '', desc: '', salones: '', cancha: false, informatica: false, extras: ''
-  });
-  const [editingSedeId, setEditingSedeId] = useState(null);
-
-  const fetchSedes = async () => {
-    const { data, error } = await supabase.from('sedes').select('*');
-    if (error) {
-      console.error("Error fetching sedes:", error);
-    } else {
-      setSedes(data || []);
-    }
-  };
+  // ===================== SEDES CRUD =====================
 
   const handleSedeSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage('');
+
+    let imgUrl = sedeForm.img.trim();
+    if (sedeImgFile) {
+      try {
+        imgUrl = await uploadImage(sedeImgFile, 'sedes');
+      } catch (err) {
+        console.error("Error uploading image:", err);
+        setErrorMessage("Error al subir la imagen. Intenta de nuevo.");
+        return;
+      }
+    }
+
     const payload = {
       slug: sedeForm.name.toLowerCase().replace(/\s+/g, '-'),
       name: sedeForm.name,
       tipo: sedeForm.tipo,
       location: sedeForm.location,
       students: parseInt(sedeForm.students),
-      img: sedeForm.img,
-      description: [sedeForm.desc],
+      img: imgUrl,
+      description: sedeForm.desc.split('\n').filter(p => p.trim()),
       infra: {
         salones: parseInt(sedeForm.salones),
         cancha: sedeForm.cancha,
@@ -416,21 +547,26 @@ export default function AdminPanel() {
       }
     };
 
-    let operation;
-    if (editingSedeId) {
-      operation = supabase.from('sedes').update(payload).eq('id', editingSedeId);
-    } else {
-      operation = supabase.from('sedes').insert([payload]);
-    }
-    const { error } = await operation;
-    if (error) {
-      console.error("Error saving sede:", error);
-    } else {
+    try {
+      let operation;
+      if (editingSedeId) {
+        operation = supabase.from('sedes').update(payload).eq('id', editingSedeId);
+      } else {
+        operation = supabase.from('sedes').insert([payload]);
+      }
+      const { error } = await operation;
+      if (error) throw error;
       setEditingSedeId(null);
       setSedeForm({ name: '', tipo: 'Urbana', location: '', students: '', img: '', desc: '', salones: '', cancha: false, informatica: false, extras: '' });
+      setSedeImgFile(null);
       fetchSedes();
+    } catch (err) {
+      console.error("Error saving sede:", err);
+      setErrorMessage("Error al guardar la sede. Intenta de nuevo.");
     }
   };
+
+  // ===================== RENDER =====================
 
   if (loading) {
     return (
@@ -447,12 +583,37 @@ export default function AdminPanel() {
       <div className="section-head" style={{ textAlign: 'center', marginBottom: '3rem' }}>
         <span className="eyebrow" style={{ color: 'var(--accent)' }}>Panel de Administración</span>
         <h2 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)' }}>Gestión de Contenidos</h2>
-        <p style={{ maxWidth: '600px', margin: '1rem auto 0', color: 'var(--destructive)', fontWeight: 'bold' }}>
-          ⚠️ Importante: Esta es una funcionalidad de demostración. En un entorno real, esto requeriría un backend y autenticación segura.
-        </p>
       </div>
 
-      {/* Hamburger button for admin panel on mobile */}
+      {errorMessage && (
+        <div style={{
+          background: 'var(--destructive)',
+          color: '#fff',
+          padding: '0.75rem 1.25rem',
+          borderRadius: '0.75rem',
+          marginBottom: '1.5rem',
+          textAlign: 'center',
+          fontWeight: 600,
+          fontSize: '0.9rem'
+        }}>
+          {errorMessage}
+          <button
+            onClick={() => setErrorMessage('')}
+            style={{
+              marginLeft: '1rem',
+              background: 'none',
+              border: '1px solid rgba(255,255,255,0.3)',
+              color: '#fff',
+              borderRadius: '0.5rem',
+              padding: '0.2rem 0.6rem',
+              cursor: 'pointer'
+            }}
+          >
+            X
+          </button>
+        </div>
+      )}
+
       <button
         className="admin-hamburger"
         type="button"
@@ -460,68 +621,21 @@ export default function AdminPanel() {
         aria-label="Abrir menú de administración"
         aria-expanded={adminMobileMenuOpen}
       >
-        {adminMobileMenuOpen ? '✕ Cerrar Menú' : '☰ Gestión de Contenidos'}
+        {adminMobileMenuOpen ? <><X size={18} /> Cerrar Menú</> : <><Menu size={18} /> Gestión de Contenidos</>}
       </button>
 
-      {/* Navegación por pestañas */}
       <div className={`admin-tabs-nav ${adminMobileMenuOpen ? 'open' : ''}`}>
-        <button
-          onClick={() => handleTabClick('directivos')}
-          className={`admin-tab-button ${activeTab === 'directivos' ? 'active' : ''}`}
-        >
-          🏛️ Directivos
-        </button>
-        <button
-          onClick={() => handleTabClick('docentes')}
-          className={`admin-tab-button ${activeTab === 'docentes' ? 'active' : ''}`}
-        >
-          🧑‍🏫 Docentes
-        </button>
-        <button
-          onClick={() => handleTabClick('galeria')}
-          className={`admin-tab-button ${activeTab === 'galeria' ? 'active' : ''}`}
-        >
-          📸 Galería
-        </button>
-        <button
-          onClick={() => handleTabClick('historia')}
-          className={`admin-tab-button ${activeTab === 'historia' ? 'active' : ''}`}
-        >
-          📜 Historia
-        </button>
-        <button
-          onClick={() => handleTabClick('sedes')}
-          className={`admin-tab-button ${activeTab === 'sedes' ? 'active' : ''}`}
-        >
-          🏫 Sedes
-        </button>
-        <button
-          onClick={() => handleTabClick('psicologia')}
-          className={`admin-tab-button ${activeTab === 'psicologia' ? 'active' : ''}`}
-        >
-          🧠 Salud Mental
-        </button>
-        <button
-          onClick={() => handleTabClick('transparencia')}
-          className={`admin-tab-button ${activeTab === 'transparencia' ? 'active' : ''}`}
-        >
-          📂 Atención Ciudadana
-        </button>
-        <button
-          onClick={() => handleTabClick('cuadro-honor')}
-          className={`admin-tab-button ${activeTab === 'cuadro-honor' ? 'active' : ''}`}
-        >
-          🏆 Cuadro de Honor
-        </button>
-        <button
-          onClick={() => handleTabClick('constitucion')}
-          className={`admin-tab-button ${activeTab === 'constitucion' ? 'active' : ''}`}
-        >
-          ⚖️ Horas Legales
-        </button>
+        <button onClick={() => handleTabClick('directivos')} className={`admin-tab-button ${activeTab === 'directivos' ? 'active' : ''}`}>🏛️ Directivos</button>
+        <button onClick={() => handleTabClick('docentes')} className={`admin-tab-button ${activeTab === 'docentes' ? 'active' : ''}`}>🧑‍🏫 Docentes</button>
+        <button onClick={() => handleTabClick('galeria')} className={`admin-tab-button ${activeTab === 'galeria' ? 'active' : ''}`}>📸 Galería</button>
+        <button onClick={() => handleTabClick('historia')} className={`admin-tab-button ${activeTab === 'historia' ? 'active' : ''}`}>📜 Historia</button>
+        <button onClick={() => handleTabClick('sedes')} className={`admin-tab-button ${activeTab === 'sedes' ? 'active' : ''}`}>🏫 Sedes</button>
+        <button onClick={() => handleTabClick('psicologia')} className={`admin-tab-button ${activeTab === 'psicologia' ? 'active' : ''}`}>🧠 Salud Mental</button>
+        <button onClick={() => handleTabClick('transparencia')} className={`admin-tab-button ${activeTab === 'transparencia' ? 'active' : ''}`}>📂 Atención Ciudadana</button>
+        <button onClick={() => handleTabClick('cuadro-honor')} className={`admin-tab-button ${activeTab === 'cuadro-honor' ? 'active' : ''}`}>🏆 Cuadro de Honor</button>
+        <button onClick={() => handleTabClick('constitucion')} className={`admin-tab-button ${activeTab === 'constitucion' ? 'active' : ''}`}>⚖️ Horas Legales</button>
       </div>
 
-      {/* Contenido de la pestaña activa */}
       {activeTab === 'directivos' && (
         <section>
           <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1.5rem', color: 'var(--primary)' }}>Gestión de Directivos</h3>
@@ -565,8 +679,20 @@ export default function AdminPanel() {
               <input type="text" required value={nombreDocente} onChange={e => setNombreDocente(e.target.value)} />
             </div>
             <div className="form-group">
-              <label>URL de la Foto (Opcional)</label>
-              <input type="url" placeholder="https://ejemplo.com/foto.jpg" value={fotoDocente} onChange={e => setFotoDocente(e.target.value)} />
+              <label>Foto</label>
+              <input type="file" accept="image/*" onChange={e => setFotoDocenteFile(e.target.files[0])} />
+              {(fotoDocenteFile || fotoDocente) && (
+                <div style={{ marginTop: '0.5rem' }}>
+                  <img
+                    src={fotoDocenteFile ? URL.createObjectURL(fotoDocenteFile) : fotoDocente}
+                    alt="Preview"
+                    style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--primary)' }}
+                  />
+                  {fotoDocente && !fotoDocenteFile && (
+                    <p style={{ fontSize: '0.75rem', color: 'var(--muted-fg)', marginTop: '0.25rem' }}>URL actual: {fotoDocente}</p>
+                  )}
+                </div>
+              )}
             </div>
             <div className="form-row">
               <div className="form-group">
@@ -581,15 +707,15 @@ export default function AdminPanel() {
                 <input type="text" value={cargoDocente} onChange={e => setCargoDocente(e.target.value)} />
               </div>
             </div>
-            <button type="submit" className="btn-submit">
-              {editingDocenteId !== null ? 'Guardar Cambios' : 'Registrar Docente'}
+            <button type="submit" className="btn-submit" disabled={uploading}>
+              {uploading ? 'Subiendo imagen...' : (editingDocenteId !== null ? 'Guardar Cambios' : 'Registrar Docente')}
             </button>
           </form>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
             {docentes.map((d) => (
               <div key={d.id} className="card" style={{ padding: '1.5rem' }}>
-                {d.foto && (
-                  <img src={d.foto} alt={d.nombre} style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', marginBottom: '1rem', border: '2px solid var(--primary)' }} />
+                  {d.foto && (
+                  <img src={d.foto} alt={d.nombre} loading="lazy" style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', marginBottom: '1rem', border: '2px solid var(--primary)' }} />
                 )}
                 <h4 style={{ color: 'var(--primary)', margin: 0 }}>{d.nombre}</h4>
                 <p style={{ fontSize: '0.85rem', color: 'var(--accent)', fontWeight: 'bold' }}>{d.area}</p>
@@ -627,7 +753,7 @@ export default function AdminPanel() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '1rem' }}>
             {galleryImages.map((img) => (
               <div key={img.id} className="card" style={{ padding: '1rem' }}>
-                <img src={img.thumb} alt={img.alt} style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: '0.5rem', marginBottom: '0.5rem' }} />
+                  <img src={img.thumb} alt={img.alt} loading="lazy" style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: '0.5rem', marginBottom: '0.5rem' }} />
                 <p style={{ fontSize: '0.8rem', margin: 0 }}>{img.alt}</p>
                 <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
                   <button onClick={() => startEditImage(img)} className="btn" style={{ padding: '0.3rem 0.6rem', fontSize: '0.7rem' }}>Editar</button>
@@ -698,7 +824,7 @@ export default function AdminPanel() {
       {activeTab === 'sedes' && (
         <section>
           <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1.5rem', color: 'var(--primary)' }}>Gestión de Sedes Institucionales</h3>
-          
+
           <form onSubmit={handleSedeSubmit} className="admin-form" style={{ border: '2px solid var(--accent)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
               <div>
@@ -711,6 +837,7 @@ export default function AdminPanel() {
                 <button type="button" onClick={() => {
                   setEditingSedeId(null);
                   setSedeForm({ name: '', tipo: 'Urbana', location: '', students: '', img: '', desc: '', salones: '', cancha: false, informatica: false, extras: '' });
+                  setSedeImgFile(null);
                 }} className="btn" style={{ background: 'var(--muted)', padding: '0.4rem 0.8rem' }}>
                   Cancelar edición
                 </button>
@@ -726,31 +853,46 @@ export default function AdminPanel() {
             <input type="text" placeholder="Ubicación" required value={sedeForm.location} onChange={e => setSedeForm({...sedeForm, location: e.target.value})} />
             <div className="form-row">
               <input type="number" placeholder="Cantidad estudiantes" required value={sedeForm.students} onChange={e => setSedeForm({...sedeForm, students: e.target.value})} />
-              <input type="url" placeholder="URL Imagen de la Sede" required value={sedeForm.img} onChange={e => setSedeForm({...sedeForm, img: e.target.value})} />
+              <div className="form-group" style={{ margin: 0 }}>
+                <label style={{ fontSize: '0.85rem', marginBottom: '0.25rem', display: 'block' }}>Imagen de la Sede</label>
+                <input type="file" accept="image/*" onChange={e => setSedeImgFile(e.target.files[0])} />
+                {(sedeImgFile || sedeForm.img) && (
+                  <div style={{ marginTop: '0.5rem' }}>
+                    <img
+                      src={sedeImgFile ? URL.createObjectURL(sedeImgFile) : sedeForm.img}
+                      alt="Preview"
+                      style={{ width: '100%', height: '80px', objectFit: 'cover', borderRadius: '0.5rem' }}
+                    />
+                    {sedeForm.img && !sedeImgFile && (
+                      <p style={{ fontSize: '0.7rem', color: 'var(--muted-fg)', marginTop: '0.25rem' }}>URL actual: {sedeForm.img}</p>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
-            <textarea placeholder="Descripción detallada" rows="3" required value={sedeForm.desc} onChange={e => setSedeForm({...sedeForm, desc: e.target.value})}></textarea>
+            <textarea placeholder="Descripción detallada (cada párrafo en línea separada)" rows="3" required value={sedeForm.desc} onChange={e => setSedeForm({...sedeForm, desc: e.target.value})}></textarea>
             <div className="form-row" style={{ alignItems: 'center' }}>
               <input type="number" placeholder="N° Salones" value={sedeForm.salones} onChange={e => setSedeForm({...sedeForm, salones: e.target.value})} />
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}><input type="checkbox" checked={sedeForm.cancha} onChange={e => setSedeForm({...sedeForm, cancha: e.target.checked})} /> Cancha</label>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}><input type="checkbox" checked={sedeForm.informatica} onChange={e => setSedeForm({...sedeForm, informatica: e.target.checked})} /> Informática</label>
             </div>
             <input type="text" placeholder="Extras (separados por coma: Biblioteca, Comedor, etc.)" value={sedeForm.extras} onChange={e => setSedeForm({...sedeForm, extras: e.target.value})} />
-            <button type="submit" className="btn-submit">
-              {editingSedeId !== null ? 'Guardar Cambios en la Sede' : 'Agregar Sede'}
+            <button type="submit" className="btn-submit" disabled={uploading}>
+              {uploading ? 'Subiendo imagen...' : (editingSedeId !== null ? 'Guardar Cambios en la Sede' : 'Agregar Sede')}
             </button>
           </form>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
             {sedes.map((s) => (
               <div key={s.id} className="card" style={{ padding: '1rem' }}>
-                <img src={s.img} alt={s.name} style={{ width: '100%', height: '120px', objectFit: 'cover', borderRadius: '0.5rem' }} />
+                <img src={s.img} alt={s.name} loading="lazy" style={{ width: '100%', height: '120px', objectFit: 'cover', borderRadius: '0.5rem' }} />
                 <h4 style={{ margin: '0.5rem 0' }}>{s.name}</h4>
                 <p style={{ fontSize: '0.8rem', color: 'var(--muted-fg)' }}>{s.location} | {s.students} Est.</p>
                 <div style={{ marginTop: '1rem' }}>
-                  <button onClick={(e) => {
+                  <button onClick={() => {
                     window.scrollTo({ top: 400, behavior: 'smooth' });
                     const infra = s?.infra || {};
-                    const descValue = Array.isArray(s?.description) ? s.description[0] : (typeof s?.description === 'string' ? s.description : '');
+                    const descValue = Array.isArray(s?.description) ? s.description.join('\n') : (typeof s?.description === 'string' ? s.description : '');
                     const extrasValue = Array.isArray(infra.extras) ? infra.extras.join(', ') : (typeof infra.extras === 'string' ? infra.extras : '');
                     setEditingSedeId(s.id);
                     setSedeForm({
@@ -765,6 +907,7 @@ export default function AdminPanel() {
                       informatica: infra?.informatica ?? false,
                       extras: extrasValue
                     });
+                    setSedeImgFile(null);
                   }} className="btn" style={{ padding: '0.6rem', fontSize: '0.9rem', width: '100%', background: 'var(--primary)', color: 'white' }}>Gestionar Contenido</button>
                 </div>
               </div>
@@ -801,8 +944,8 @@ export default function AdminPanel() {
           </form>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
-            {psicologiaTemas.map((t, idx) => (
-              <div key={idx} className="card" style={{ padding: '1.5rem' }}>
+            {psicologiaTemas.map((t) => (
+              <div key={t.id} className="card" style={{ padding: '1.5rem' }}>
                 <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{t.icon}</div>
                 <h4 style={{ color: 'var(--primary)', margin: '0 0 0.5rem 0' }}>{t.title}</h4>
                 <p style={{ fontSize: '0.85rem', color: 'var(--muted-fg)', margin: 0 }}>{t.short}</p>
@@ -862,8 +1005,20 @@ export default function AdminPanel() {
           <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1.5rem', color: 'var(--primary)' }}>Gestión de Cuadro de Honor</h3>
           <form onSubmit={handleStudentSubmit} className="card" style={{ padding: '2.5rem 2rem', marginBottom: '3rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             <div>
-              <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.4rem' }}>URL Foto Estudiante</label>
-              <input type="url" required style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: '#fff', fontSize: '0.95rem' }} value={studentPhoto} onChange={e => setStudentPhoto(e.target.value)} />
+              <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.4rem' }}>Foto del Estudiante</label>
+              <input type="file" accept="image/*" onChange={e => setStudentPhotoFile(e.target.files[0])} />
+              {(studentPhotoFile || studentPhoto) && (
+                <div style={{ marginTop: '0.5rem' }}>
+                  <img
+                    src={studentPhotoFile ? URL.createObjectURL(studentPhotoFile) : studentPhoto}
+                    alt="Preview"
+                    style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--primary)' }}
+                  />
+                  {studentPhoto && !studentPhotoFile && (
+                    <p style={{ fontSize: '0.75rem', color: 'var(--muted-fg)', marginTop: '0.25rem' }}>URL actual: {studentPhoto}</p>
+                  )}
+                </div>
+              )}
             </div>
             <div>
               <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.4rem' }}>Nombre Estudiante</label>
@@ -877,14 +1032,14 @@ export default function AdminPanel() {
               <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.4rem' }}>Materia/Área</label>
               <input type="text" required style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: '#fff', fontSize: '0.95rem' }} value={studentSubject} onChange={e => setStudentSubject(e.target.value)} />
             </div>
-            <button type="submit" className="btn" style={{ background: 'var(--primary)', color: 'white', padding: '0.85rem' }}>
-              {editingStudentId !== null ? 'Actualizar Estudiante' : 'Añadir Estudiante'}
+            <button type="submit" className="btn" style={{ background: 'var(--primary)', color: 'white', padding: '0.85rem' }} disabled={uploading}>
+              {uploading ? 'Subiendo imagen...' : (editingStudentId !== null ? 'Actualizar Estudiante' : 'Añadir Estudiante')}
             </button>
           </form>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
             {honorStudents.map((s) => (
               <div key={s.id} className="card" style={{ padding: '1rem', textAlign: 'center' }}>
-                <img src={s.photo} alt={s.name} style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 0.5rem' }} />
+                <img src={s.photo} alt={s.name} loading="lazy" style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 0.5rem' }} />
                 <h4 style={{ color: 'var(--primary)', margin: 0 }}>{s.name}</h4>
                 <p style={{ fontSize: '0.8rem', color: 'var(--muted-fg)', margin: '0.2rem 0' }}>{s.achievement}</p>
                 <p style={{ fontSize: '0.75rem', color: 'var(--accent)', fontWeight: 'bold' }}>{s.subject}</p>
@@ -905,9 +1060,9 @@ export default function AdminPanel() {
             <div className="card" style={{ padding: '2rem' }}>
               <h4 style={{ marginBottom: '1rem' }}>📝 Estudios Constitucionales (50 Horas)</h4>
               <p><strong>Enlace del cuestionario:</strong></p>
-              <input 
-                type="text" 
-                readOnly 
+              <input
+                type="text"
+                readOnly
                 value="https://docs.google.com/document/d/1GSEw_Ux95-nIH1HiC6cpgiilCefcE_op7sCAzC0pjIs/edit?usp=sharing"
                 style={{ width: '100%', padding: '0.75rem', marginTop: '0.5rem', background: '#f1f5f9', border: '1px solid var(--border)', borderRadius: '4px' }}
               />
@@ -917,7 +1072,7 @@ export default function AdminPanel() {
               <h4 style={{ marginBottom: '1rem' }}>🤝 Servicio Social Estudiantil (80 Horas)</h4>
               <p><strong>Estado del Proyecto:</strong></p>
               <div style={{ padding: '1rem', background: '#e0f2fe', color: '#0369a1', borderRadius: '8px', fontSize: '0.9rem' }}>
-                <strong>Fase actual:</strong> Inscripciones abiertas para proyectos comunitarios y alfabetización. 
+                <strong>Fase actual:</strong> Inscripciones abiertas para proyectos comunitarios y alfabetización.
                 Los formatos de asistencia se entregan en coordinación.
               </div>
               <p style={{ marginTop: '1rem', fontSize: '0.9rem', color: 'var(--muted-fg)' }}>

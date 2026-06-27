@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import Login from './Login';
+import { LogOut, User } from 'lucide-react';
 
 export default function PrivateRoute({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Verificar si hay una sesión activa
     const checkAuth = async () => {
       const { data } = await supabase.auth.getSession();
       setUser(data?.session?.user || null);
@@ -16,7 +16,6 @@ export default function PrivateRoute({ children }) {
 
     checkAuth();
 
-    // Escuchar cambios de autenticación
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user || null);
     });
@@ -32,12 +31,15 @@ export default function PrivateRoute({ children }) {
   };
 
   const handleLoginSuccess = () => {
-    // Re-verificar la sesión después del login
     const checkSession = async () => {
       const { data } = await supabase.auth.getSession();
       setUser(data?.session?.user || null);
     };
     checkSession();
+  };
+
+  const getInitial = (email) => {
+    return email ? email[0].toUpperCase() : '?';
   };
 
   if (loading) {
@@ -57,9 +59,11 @@ export default function PrivateRoute({ children }) {
     <div className="private-route-wrapper">
       <div className="admin-session-bar">
         <div className="session-info">
-          <span>👤 {user.email}</span>
+          <span className="session-avatar">{getInitial(user.email)}</span>
+          <span className="session-email">{user.email}</span>
         </div>
         <button onClick={handleLogout} className="logout-button">
+          <LogOut size={16} />
           Cerrar Sesión
         </button>
       </div>

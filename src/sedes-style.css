@@ -1,131 +1,5 @@
-:root {
-  --primary: #006400;
-  --primary-2: #008000;
-  --accent: #f4b400;
-  --bg: #faf6f0;
-  --surface: #ffffff;
-  --text: #1f2a24;
-  --muted: #6b7269;
-  --border: #e6e1d6;
-  --radius: 14px;
-  --shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-}
-html {
-  scroll-behavior: smooth;
-}
-body {
-  font-family: "Source Sans 3", system-ui, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.6;
-}
-h1,
-h2,
-h3 {
-  font-family: "Playfair Display", serif;
-  color: var(--primary);
-  line-height: 1.2;
-}
-img {
-  max-width: 100%;
-  display: block;
-}
-a {
-  color: var(--primary);
-  text-decoration: none;
-}
-
-/* Navbar */
-.nav {
-  position: sticky;
-  top: 0;
-  background: var(--bg);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--border);
-  z-index: 50;
-}
-.nav-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 14px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 700;
-  color: var(--primary);
-  text-decoration: none;
-}
-.brand-mark {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--primary);
-  color: #fff;
-  display: grid;
-  place-items: center;
-  font-family: "Playfair Display", serif;
-}
-.nav a.back {
-  font-size: 0.9rem;
-  color: var(--muted);
-}
-.escudo {
-  width: 44px;
-  height: 44px;
-  border-radius: 60%;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.escudo img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
-}
-.escudo:hover {
-  opacity: 0.9;
-  transform: scale(1.03);
-  transition: all 0.3s;
-}
-
-/* Layout */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-.section {
-  padding: 64px 0;
-}
-
-/* Sedes section */
-.section-head {
-  text-align: center;
-  max-width: 720px;
-  margin: 0 auto 40px;
-}
-.section-head .eyebrow {
-  color: var(--primary-2);
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  font-size: 0.8rem;
-}
-.section-head h2 {
-  font-size: clamp(1.8rem, 3.2vw, 2.6rem);
-  margin: 8px 0 12px;
-}
-.section-head p {
-  color: black;
-}
+/* ===== SEDES PAGE UNIQUE STYLES ===== */
+/* Only styles specific to the sedes page, no duplicates from App.css */
 
 .filters {
   display: flex;
@@ -136,12 +10,12 @@ a {
 }
 .chip {
   border: 1px solid var(--border);
-  background: var(--surface);
+  background: var(--card);
   padding: 8px 16px;
   border-radius: 999px;
   cursor: pointer;
   font: inherit;
-  color: var(--text);
+  color: var(--foreground);
   transition: 0.2s;
 }
 .chip:hover {
@@ -158,21 +32,27 @@ a {
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 22px;
 }
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  transition: 0.25s;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+
+.section {
+  padding: 64px 0;
 }
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow);
-  background-color: #ddd;
+.section-head {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto 40px;
 }
+.section-head .eyebrow {
+  color: var(--primary-light);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+.section-head h2 {
+  font-size: clamp(1.8rem, 3.2vw, 2.6rem);
+  margin: 8px 0 12px;
+}
+
 .card .thumb {
   aspect-ratio: 16/10;
   background: #ddd;
@@ -204,7 +84,7 @@ a {
   color: #3a2b00;
 }
 .badge.rural {
-  background: var(--primary-2);
+  background: var(--primary-light);
   color: #fff;
 }
 .card-body {
@@ -221,7 +101,7 @@ a {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  color: var(--muted);
+  color: var(--muted-text);
   font-size: 0.92rem;
   margin-top: 4px;
 }
@@ -230,12 +110,7 @@ a {
   align-items: center;
   gap: 8px;
 }
-.icon {
-  width: 16px;
-  height: 16px;
-  flex: 0 0 16px;
-  color: var(--primary-2);
-}
+
 .btn {
   margin-top: auto;
   display: inline-flex;
@@ -252,19 +127,10 @@ a {
   font: inherit;
 }
 .btn:hover {
-  background: var(--primary-2);
-}
-.btn.outline {
-  background: transparent;
-  color: var(--primary);
-  border: 1.5px solid var(--primary);
-}
-.btn.outline:hover {
-  background: var(--primary);
-  color: #fff;
+  opacity: 0.9;
 }
 
-/* Detail */
+/* Detail page hero */
 .hero {
   position: relative;
   min-height: 340px;
@@ -327,12 +193,9 @@ a {
   border-color: #fff;
   transform: translateX(-5px);
 }
-
 .sede-header-meta {
   margin-bottom: 8px;
 }
-.badge { position: static !important; display: inline-block !important; }
-
 .detail-grid {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -349,7 +212,6 @@ a {
 }
 .detail-grid p {
   margin-bottom: 14px;
-  color: #384039;
 }
 .infra {
   display: grid;
@@ -358,7 +220,7 @@ a {
   margin-top: 8px;
 }
 .infra-item {
-  background: var(--surface);
+  background: var(--card);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 16px;
@@ -374,7 +236,7 @@ a {
 .infra-item .val {
   margin-top: 6px;
   font-size: 0.9rem;
-  color: var(--muted);
+  color: var(--muted-text);
 }
 .infra-item .val.ok {
   color: #1f6f1f;
@@ -393,9 +255,8 @@ a {
   border-radius: 999px;
   font-size: 0.85rem;
 }
-
 aside.side {
-  background: var(--surface);
+  background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 22px;
@@ -410,13 +271,12 @@ aside.side .row .k {
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--muted);
+  color: var(--muted-text);
 }
 aside.side .row .v {
   font-weight: 700;
   margin-top: 2px;
 }
-
 .hidden {
   display: none !important;
 }
@@ -424,72 +284,39 @@ aside.side .row .v {
 footer {
   padding: 40px 20px;
   text-align: center;
-  color: var(--muted);
+  color: var(--muted-text);
   font-size: 0.9rem;
   border-top: 1px solid var(--border);
   margin-top: 40px;
-  background: var(--surface);
+  background: var(--card);
 }
 
-
-/* ==========================================================================
-   PARCHE AISLADO PARA LA PÁGINA DE SEDES
-   ========================================================================== */
-body.dark {
-  --bg: #030a04;
-  --surface: #0a1a0d;
-  --text: #f8fafc;
-  --muted: #cbd5e1;
-  --border: #1a3a20;
-  background: var(--bg) !important;
-  color: var(--text) !important;
-}
-
-body.dark .btn,
-body.dark .btn-primary,
-body.dark .chip.active {
-  color: #000000 !important;
-}
-
-/* Cambia las tarjetas de la sección sedes */
-body.dark .card {
-  background: var(--surface) !important;
-  border-color: var(--border) !important;
-}
-
+/* Dark mode overrides for sedes page only */
 body.dark .chip {
-  background: var(--surface) !important;
-  color: var(--text) !important;
+  background: var(--card) !important;
+  color: var(--foreground) !important;
   border-color: var(--border) !important;
 }
-
 body.dark .infra-item {
-  background: var(--surface) !important;
+  background: var(--card) !important;
   border-color: var(--border) !important;
 }
-
 body.dark .extras span {
   background: #1a3a20 !important;
   color: #4ade80 !important;
   border-color: #2d5a36 !important;
 }
-
-/* Ajusta los textos dentro de la tarjeta de sedes */
-body.dark .card-body h3,
-body.dark .section-head h2 {
-  color: #f8fafc !important;
+body.dark .card .thumb {
+  background: #112415;
 }
-
-body.dark p,
-body.dark .section-head p,
-body.dark .meta,
-body.dark .meta div,
-body.dark .detail-grid p {
-  color: #e2e8f0 !important;
-}
-
-/* Si usas la barra lateral (aside) en el detalle de la sede */
 body.dark aside.side {
-  background: #112915 !important;
-  border-color: #23472a !important;
+  background: var(--card) !important;
+  border-color: var(--border) !important;
+}
+body.dark footer {
+  background: var(--card) !important;
+  border-color: var(--border) !important;
+}
+body.dark .card-body h3 {
+  color: var(--foreground) !important;
 }

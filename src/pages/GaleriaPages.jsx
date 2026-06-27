@@ -1,23 +1,30 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
-import '../App.css'; //
+import '../App.css';
 
 export default function GaleriaPages() {
   const [fotoActiva, setFotoActiva] = useState(null);
+  const [galleryImages, setGalleryImages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Efecto para que cuando la página cargue, suba automáticamente al inicio (Top 0)
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Cargar imágenes de la galería desde localStorage
-  const [galleryImages, setGalleryImages] = useState([]);
-
   useEffect(() => {
     const fetchGallery = async () => {
-      const { data, error } = await supabase.from('galeria').select('*').order('created_at', { ascending: false });
-      if (!error && data) setGalleryImages(data);
+      try {
+        const { data, error } = await supabase.from('galeria').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        setGalleryImages(data || []);
+      } catch (err) {
+        console.error('Error fetching gallery:', err);
+        setError('No se pudieron cargar las imágenes.');
+      } finally {
+        setLoading(false);
+      }
     };
     fetchGallery();
   }, []);
@@ -26,7 +33,6 @@ export default function GaleriaPages() {
     <div className="page-layout" style={{ paddingTop: '80px', minHeight: '80vh' }}>
       <div className="container">
         
-        {/* Botón para regresar al inicio */}
         <Link to="/" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 'bold', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
           ← Volver al Inicio
         </Link>
@@ -35,22 +41,23 @@ export default function GaleriaPages() {
         <p className="section-subtitle" style={{ textAlign: 'left', marginBottom: '2rem' }}>Explora todos los momentos, eventos y recuerdos de nuestra comunidad educativa.</p>
       <div className="divider" style={{ margin: '0 0 2.5rem 0' }}></div>
 
-        {/* Aquí mapeamos TODO el array de imágenes sin cortes (Las 10 completas) */}
+        {error && <p style={{ color: 'var(--destructive)', textAlign: 'center', marginBottom: '1rem' }}>{error}</p>}
+        {loading && galleryImages.length === 0 && <p style={{ textAlign: 'center', color: 'var(--muted-fg)' }}>Cargando galería...</p>}
+
         <div className="gallery-grid">
-          {galleryImages.map((image, index) => (
+          {galleryImages.map((image) => (
             <div
-              key={index}
+              key={image.id || image.thumb}
               className={`gallery-item ${image.large ? 'large' : ''}`}
               onClick={() => setFotoActiva(image.full)}
               style={{ cursor: 'pointer' }}
             >
-              <img src={image.thumb} alt={image.alt} />
+              <img src={image.thumb} alt={image.alt} loading="lazy" />
             </div>
           ))}
         </div>
       </div>
 
-      {/* Lightbox de pantalla completa */}
       {fotoActiva && (
         <div className="lightbox open" onClick={() => setFotoActiva(null)}>
           <button className="lightbox-close" type="button" onClick={() => setFotoActiva(null)}>✕</button>

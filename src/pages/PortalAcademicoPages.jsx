@@ -77,7 +77,7 @@ export default function PortalAcademicoPages() {
       </div>
 
       <div style={{ maxWidth: '700px', margin: '0 auto' }}>
-        <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1.5rem', color: 'var(--primary)', textCenter: 'center' }}>
+        <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1.5rem', color: 'var(--primary)',           textAlign: 'center' }}>
           Preguntas frecuentes del portal
         </h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -90,7 +90,7 @@ export default function PortalAcademicoPages() {
                 <span>{faq.q}</span>
                 <span style={{ color: 'var(--accent)' }}>{openFaq === faq.id ? "▲" : "▼"}</span>
               </button>
-              <div style={{ maxHeight: openFaq === faq.id ? '200px' : '0', overflow: 'hidden', transition: 'all 0.3s ease-out', color: 'var(--muted-fg)', pb: openFaq === faq.id ? '1.25rem' : '0' }}>
+              <div style={{ maxHeight: openFaq === faq.id ? '200px' : '0', overflow: 'hidden', transition: 'all 0.3s ease-out', color: 'var(--muted-fg)',               paddingBottom: openFaq === faq.id ? '1.25rem' : '0' }}>
                 <p style={{ paddingBottom: '1.25rem', fontSize: '0.95rem', lineHeight: '1.5', borderTop: '1px solid var(--border)', paddingTop: '1rem' }}>{faq.a}</p>
               </div>
             </div>

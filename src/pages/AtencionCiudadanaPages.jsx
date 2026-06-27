@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import '../App.css';
 
+const EMAIL_CONTACTO = import.meta.env.VITE_CONTACT_EMAIL || 'MontoyaLoped@gmail.com';
+
 export default function AtencionCiudadanaPages() {
   const [formState, setFormState] = useState({
     nombre: '',
@@ -19,29 +21,20 @@ export default function AtencionCiudadanaPages() {
 
     const { nombre, correo, tipo, mensaje } = formState;
     
-    const recipientEmail = 'MontoyaLoped@gmail.com';
     const subject = `PQRS - ${tipo} de ${nombre}`;
     const bodyText = `Nombre: ${nombre}\nCorreo: ${correo}\nTipo: ${tipo}\n\nMensaje:\n${mensaje}`;
 
-    const mailtoUrl = `mailto:${recipientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyText)}`;
+    const mailtoUrl = `mailto:${EMAIL_CONTACTO}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyText)}`;
 
     try {
       window.location.href = mailtoUrl;
-      
-      // Feedback más claro
-      setTimeout(() => {
-        alert('✅ Se ha abierto tu cliente de correo con la información prellenada.\n\nPor favor, revisa los datos y haz clic en "Enviar".');
-      }, 300);
-
     } catch (error) {
-      alert('No se pudo abrir el cliente de correo. Por favor envía tu mensaje manualmente a: MontoyaLoped@gmail.com');
+      console.error('Error al abrir cliente de correo:', error);
     }
 
-    // Feedback visual
     setIsSubmitting(false);
     setSubmitted(true);
     setFormState({ nombre: '', correo: '', tipo: 'Sugerencia', mensaje: '' });
-
     setTimeout(() => setSubmitted(false), 6000);
   };
 
@@ -53,14 +46,25 @@ export default function AtencionCiudadanaPages() {
   ];
 
   const [documentos, setDocumentos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchTransparencia = async () => {
-      const { data, error } = await supabase.from('transparencia').select('*');
-      if (!error && data && data.length > 0) {
-        setDocumentos(data);
-      } else {
+      try {
+        const { data, error } = await supabase.from('transparencia').select('*');
+        if (error) throw error;
+        if (data && data.length > 0) {
+          setDocumentos(data);
+        } else {
+          setDocumentos(DOCUMENTOS_ESTATICOS);
+        }
+      } catch (err) {
+        console.error('Error fetching documentos:', err);
+        setError('No se pudieron cargar los documentos de transparencia.');
         setDocumentos(DOCUMENTOS_ESTATICOS);
+      } finally {
+        setLoading(false);
       }
     };
     fetchTransparencia();
@@ -78,7 +82,6 @@ export default function AtencionCiudadanaPages() {
       </div>
       <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '3rem', alignItems: 'flex-start' }}>
         
-        {/* LADO A: BUZÓN */}
         <section className="card" style={{ padding: '2.5rem 2rem' }}>
           <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1.5rem', color: 'var(--primary)' }}>
             Buzón Virtual de PQRS
@@ -88,7 +91,6 @@ export default function AtencionCiudadanaPages() {
           </p>
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            {/* ... (mantengo tus campos iguales) */}
             <div>
               <label htmlFor="nombre-pqrs" style={{ display: 'block', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '0.4rem', color: 'var(--foreground)' }}>Nombre completo</label>
               <input type="text" id="nombre-pqrs" required style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: '#fff', fontSize: '0.95rem' }} value={formState.nombre} onChange={e => setFormState({...formState, nombre: e.target.value})} />
@@ -126,7 +128,6 @@ export default function AtencionCiudadanaPages() {
           </form>
         </section>
 
-        {/* LADO B: TRANSPARENCIA */}
         <section style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div className="card" style={{ padding: '2rem' }}>
             <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem', color: 'var(--primary)' }}>
@@ -137,10 +138,12 @@ export default function AtencionCiudadanaPages() {
             </p>
           </div>
 
+          {error && <p style={{ color: 'var(--destructive)', textAlign: 'center' }}>{error}</p>}
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {documentos.map((doc, idx) => (
+            {documentos.map((doc) => (
               <div 
-                key={idx} 
+                key={doc.name} 
                 className="card" 
                 style={{ padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid var(--border)' }}
               >

@@ -2,26 +2,32 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import '../App.css';
-import '../sedes-style.css';
 import ModuloInduccion from '../components/ModuloInduccion';
 
 export default function DocenciaPages() {
-  // Estado para controlar qué card de materia está expandida (guarda el índice)
   const [materiaAbierta, setMateriaAbierta] = useState(null);
-
-  // Estado para controlar a qué tarjeta se le está haciendo hover (guarda el índice)
   const [materiaHover, setMateriaHover] = useState(null);
-
   const [docentes, setDocentes] = useState([]);
   const [directivos, setDirectivos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      const { data: docentesData, error: dError } = await supabase.from('docentes').select('*').order('nombre');
-      if (!dError) setDocentes(docentesData || []);
+      try {
+        const { data: docentesData, error: dError } = await supabase.from('docentes').select('*').order('nombre');
+        if (dError) throw dError;
+        setDocentes(docentesData || []);
 
-      const { data: directivosData, error: dirError } = await supabase.from('directivos').select('*');
-      if (!dirError) setDirectivos(directivosData || []);
+        const { data: directivosData, error: dirError } = await supabase.from('directivos').select('*');
+        if (dirError) throw dirError;
+        setDirectivos(directivosData || []);
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        setError('No se pudieron cargar algunos datos.');
+      } finally {
+        setLoading(false);
+      }
     };
     fetchData();
   }, []);
@@ -65,17 +71,15 @@ export default function DocenciaPages() {
     }
   ];
 
-  // Estadísticas dinámicas basadas en los datos administrados
   const totalDocentes = docentes.length > 0 ? docentes.length : 89;
   const totalCoordinadores = directivos.filter(d => d.cargo.toLowerCase().includes('coordinador')).length || 3;
   const totalRectores = directivos.filter(d => d.cargo.toLowerCase() === 'rector').length || 1;
 
-  // Función para alternar la apertura de una card
   const toggleMateria = (index) => {
     if (materiaAbierta === index) {
-      setMateriaAbierta(null); // Si ya estaba abierta, se cierra
+      setMateriaAbierta(null);
     } else {
-      setMateriaAbierta(index); // Abre la seleccionada
+      setMateriaAbierta(index);
     }
   };
 
@@ -84,12 +88,10 @@ export default function DocenciaPages() {
       <section className="section" style={{ background: 'var(--background)', padding: '4rem 0' }}>
         <div className="container" style={{ maxWidth: '1000px', margin: '0 auto' }}>
           
-          {/* Módulo de Inducción */}
           <div style={{ marginBottom: '4rem' }}>
             <ModuloInduccion />
           </div>
 
-          {/* Sección Equipo Docente */}
           <div className="section-head" style={{ textAlign: 'center', marginBottom: '3rem' }}>
             <span className="eyebrow">Planta de Personal</span>
             <h2>Equipo Docente</h2>
@@ -99,7 +101,8 @@ export default function DocenciaPages() {
             </p>
           </div>
 
-          {/* Grid de Estadísticas */}
+          {error && <p style={{ color: 'var(--destructive)', textAlign: 'center', marginBottom: '1rem' }}>{error}</p>}
+
           <div className="grid" style={{ 
             display: 'grid', 
             gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
@@ -133,7 +136,6 @@ export default function DocenciaPages() {
             </div>
           </div>
 
-          {/* Sección Directivos */}
           <div className="section-head" style={{ marginTop: '3rem', textAlign: 'center' }}>
             <h2>Directivos</h2>
             <div className='divider'></div>
@@ -141,8 +143,8 @@ export default function DocenciaPages() {
         
         {directivos.length > 0 ? (
           <div className="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', marginBottom: '4rem' }}>
-            {directivos.map((dir, idx) => (
-              <div key={idx} className="card" style={{ padding: '24px', textAlign: 'center' }}>
+            {directivos.map((dir) => (
+              <div key={dir.id || dir.nombre} className="card" style={{ padding: '24px', textAlign: 'center' }}>
                 <h3 style={{ color: 'var(--primary)', marginBottom: '0.5rem' }}>{dir.nombre}</h3>
                 <p style={{ fontWeight: 'bold', color: 'var(--accent)', textTransform: 'uppercase', fontSize: '0.9rem' }}>{dir.cargo}</p>
               </div>
@@ -159,7 +161,6 @@ export default function DocenciaPages() {
           </div>
         )}
 
-         {/* Sección Áreas Académicas - Cards con Hover Animado y Despliegue */}
 <div className="section-head" style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
   <h2>Áreas Académicas</h2>
   <div className='divider'></div>
@@ -175,13 +176,12 @@ export default function DocenciaPages() {
   marginBottom: '4rem' 
 }}>
   {AREAS_INICIALES.map((materia, index) => {
-    // Validamos si esta card específica tiene el hover o está expandida
     const esActiva = materiaAbierta === index;
     const tieneHover = materiaHover === index;
 
     return (
       <div 
-        key={index}
+        key={materia.nombre}
         className="card"
         onClick={() => toggleMateria(index)}
         onMouseEnter={() => setMateriaHover(index)}
@@ -189,14 +189,9 @@ export default function DocenciaPages() {
         style={{ 
           background: 'var(--card)', 
           cursor: 'pointer', 
-          // LA MAGIA DE LA ANIMACIÓN: Transición suave para el borde, la sombra y el movimiento
           transition: 'all 0.25s ease-in-out',
-          
-          // Borde elegante: Si tiene hover o está abierta, se ilumina con el verde primary
           border: tieneHover || esActiva ? '1px solid var(--primary)' : '1px solid var(--border)',
           borderLeft: esActiva ? '5px solid var(--primary)' : tieneHover ? '5px solid var(--primary)' : '1px solid var(--border)',
-          
-          // Efecto de elevación: Si tiene hover, la tarjeta se levanta sutilmente (-3px) y gana sombra
           transform: tieneHover ? 'translateY(-3px)' : 'translateY(0)',
           boxShadow: tieneHover || esActiva 
             ? '0 10px 20px rgba(5, 122, 85, 0.08)' 
@@ -226,7 +221,6 @@ export default function DocenciaPages() {
             </span>
           </div>
 
-          {/* Bloque desplegable condicional */}
           {esActiva && (
             <div style={{ 
               marginTop: '12px', 
@@ -245,7 +239,6 @@ export default function DocenciaPages() {
   })}
 </div>
 
-        {/* Sección de Directorio Docente Dinámico */}
         {docentes.length > 0 && (
           <div style={{ marginTop: '4rem' }}>
             <div className="section-head" style={{ textAlign: 'center', marginBottom: '2rem' }}>
@@ -253,12 +246,13 @@ export default function DocenciaPages() {
               <div className='divider'></div>
             </div>
             <div className="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
-              {docentes.map((d, idx) => (
-                <div key={idx} className="card" style={{ padding: '20px', textAlign: 'center' }}>
+              {docentes.map((d) => (
+                <div key={d.id || d.nombre} className="card" style={{ padding: '20px', textAlign: 'center' }}>
                   {d.foto && (
                     <img 
                       src={d.foto} 
                       alt={d.nombre} 
+                      loading="lazy"
                       style={{ 
                         width: '120px', height: '120px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 1.25rem', border: '4px solid var(--primary)', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' 
                       }} 

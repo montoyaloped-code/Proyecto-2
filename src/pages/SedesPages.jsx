@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import '../App.css';
 import '../sedes-style.css';
@@ -154,12 +153,25 @@ export default function Sedes() {
   const [activeFilter, setActiveFilter] = useState('all');
   const [selectedSede, setSelectedSede] = useState(null);
   const [sedesData, setSedesData] = useState(INITIAL_SEDES);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchSedes = async () => {
-      const { data, error } = await supabase.from('sedes').select('*');
-      if (!error && data && data.length > 0) {
-        setSedesData(data);
+      try {
+        const { data, error } = await supabase.from('sedes').select('*');
+        if (error) throw error;
+        if (data && data.length > 0) {
+          const merged = new Map();
+          INITIAL_SEDES.forEach(s => merged.set(s.slug, s));
+          data.forEach(s => merged.set(s.slug, s));
+          setSedesData(Array.from(merged.values()));
+        }
+      } catch (err) {
+        console.error('Error fetching sedes:', err);
+        setError('No se pudieron cargar las sedes.');
+      } finally {
+        setLoading(false);
       }
     };
     fetchSedes();
@@ -174,10 +186,9 @@ export default function Sedes() {
   if (currentSede) {
     return (
       <div> 
-
         <main>
           <section className="hero">
-            <img src={currentSede.img} alt={currentSede.name} />
+            <img src={currentSede.img} alt={currentSede.name} loading="lazy" />
             <div className="container">
               <button className="back-link" onClick={() => setSelectedSede(null)}>
                 ← Volver a sedes
@@ -248,10 +259,6 @@ export default function Sedes() {
             </div>
           </section>
         </main>
-
-        <footer>
-          © I.E. Ignacio Yepes Yepes — Remedios, Antioquia
-        </footer>
       </div>
     );
   }
@@ -270,6 +277,8 @@ export default function Sedes() {
                 integral de niños, niñas y jóvenes del municipio.
               </p>
             </div>
+
+            {error && <p style={{ color: 'var(--destructive)', textAlign: 'center', marginBottom: '1rem' }}>{error}</p>}
 
             <div className="filters" role="tablist">
               <button
@@ -294,7 +303,7 @@ export default function Sedes() {
 
             <div className="grid">
               {filteredSedes.map(sede => (
-                <article key={sede.slug} className="card">
+                <article key={sede.slug} className="card" style={{ cursor: 'pointer' }} onClick={() => setSelectedSede(sede.slug)}>
                   <div className="thumb">
                     <span className={`badge ${sede.tipo.toLowerCase()}`}>{sede.tipo}</span>
                     <img src={sede.img} alt={sede.name} loading="lazy" />
@@ -307,7 +316,6 @@ export default function Sedes() {
                     </div>
                     <button
                       className="btn"
-                      onClick={() => setSelectedSede(sede.slug)}
                     >
                       Ver sede →
                     </button>

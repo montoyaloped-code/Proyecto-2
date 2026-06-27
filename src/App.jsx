@@ -1,36 +1,58 @@
 import './App.css'
-import { useState, useEffect } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { useState, useEffect, lazy, Suspense } from 'react'
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 
-// CORRECCIÓN DE RUTAS DE PÁGINAS (PascalCase uniforme)
-import PaginaPrincipal from './pages/pagina-principal.jsx'
-import SedesPages from './pages/SedesPages.jsx'
-import DocenciaPages from './pages/docenciaPages.jsx'
-import PsicologiaPages from './pages/PsicologiaPages.jsx'
-import PortalAcademicoPages from './pages/PortalAcademicoPages.jsx'
-import AtencionCiudadanaPages from './pages/AtencionCiudadanaPages.jsx'
-import HistoriaSimbolosPages from './pages/HistoriaSimbolosPages.jsx'
-import AdminPanel from './pages/AdminPanel.jsx'; // Importa el nuevo componente de administración unificado
-import CuadroDeHonorPages from './pages/CuadroDeHonorPages.jsx'; // Nueva página de Cuadro de Honor
-import HorasConstitucionalesPages from './pages/HorasConstitucionalesPages.jsx'; // Nueva página
-
-// CORRECCIÓN DE LA CARPETA 'components' (Se corrigió la 'c' que faltaba)
-import ContactoSection from './components/ContactoSection.jsx'
-import NosotrosSection from './components/NosotrosSection.jsx'
+import ErrorBoundary from './components/ErrorBoundary.jsx'
 import Header from './components/Header.jsx'
 import Footer from './components/Footer.jsx'
-import HistoriaSection from './components/HistoriaSection.jsx'
-import GaleriaPages from './pages/GaleriaPages.jsx'
 import PrivateRoute from './components/PrivateRoute.jsx'
+import ContactoSection from './components/ContactoSection.jsx'
+import NosotrosSection from './components/NosotrosSection.jsx'
+import HistoriaSection from './components/HistoriaSection.jsx'
+
+const PaginaPrincipal = lazy(() => import('./pages/pagina-principal.jsx'))
+const SedesPages = lazy(() => import('./pages/SedesPages.jsx'))
+const DocenciaPages = lazy(() => import('./pages/docenciaPages.jsx'))
+const PsicologiaPages = lazy(() => import('./pages/PsicologiaPages.jsx'))
+const PortalAcademicoPages = lazy(() => import('./pages/PortalAcademicoPages.jsx'))
+const AtencionCiudadanaPages = lazy(() => import('./pages/AtencionCiudadanaPages.jsx'))
+const HistoriaSimbolosPages = lazy(() => import('./pages/HistoriaSimbolosPages.jsx'))
+const AdminPanel = lazy(() => import('./pages/AdminPanel.jsx'))
+const CuadroDeHonorPages = lazy(() => import('./pages/CuadroDeHonorPages.jsx'))
+const HorasConstitucionalesPages = lazy(() => import('./pages/HorasConstitucionalesPages.jsx'))
+const GaleriaPages = lazy(() => import('./pages/GaleriaPages.jsx'))
+const NotFound = lazy(() => import('./components/NotFound.jsx'))
+
+function Loader() {
+  return (
+    <div style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      minHeight: '60vh',
+      background: 'var(--background)'
+    }}>
+      <div className="spinner" />
+    </div>
+  )
+}
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
 
 function App() {
-  // 1. Estado para el Modo Oscuro
   const [darkMode, setDarkMode] = useState(() => {
     const savedTheme = localStorage.getItem('theme');
     return savedTheme === 'dark';
   });
 
-  // 2. Inyección de la clase al body
   useEffect(() => {
     if (darkMode) {
       document.body.classList.add('dark');
@@ -44,49 +66,33 @@ function App() {
   return (
     <div className="app-container">
       <BrowserRouter>
+        <ScrollToTop />
         <Header darkMode={darkMode} setDarkMode={setDarkMode} />
         
-        <Routes>
-          <Route path="/" element={<PaginaPrincipal />} />
-          <Route path="/sedes" element={<SedesPages />} />
-          <Route path="/docencia" element={<DocenciaPages />} />
-          <Route path="/nosotros" element={<NosotrosSection />} />
-          <Route path="/contacto" element={<ContactoSection />} />
-          
-          {/* RUTAS OFICIALES */}
-          <Route path="/bienestar" element={<PsicologiaPages />} />
-          <Route path="/portal-academico" element={<PortalAcademicoPages />} />
-          <Route path="/atencion-ciudadana" element={<AtencionCiudadanaPages />} />
-          <Route path="/HistoriaSimbolos" element={<HistoriaSimbolosPages />} />
-          <Route path="/galeria-completa" element={<GaleriaPages />} />
+        <ErrorBoundary>
+        <Suspense fallback={<Loader />}>
+          <Routes>
+            <Route path="/" element={<PaginaPrincipal />} />
+            <Route path="/sedes" element={<SedesPages />} />
+            <Route path="/docencia" element={<DocenciaPages />} />
+            <Route path="/nosotros" element={<NosotrosSection />} />
+            <Route path="/contacto" element={<ContactoSection />} />
 
-          {/* RUTAS DE ADMINISTRACIÓN Y CUADRO DE HONOR */}
-          <Route path="/admin" element={<PrivateRoute><AdminPanel /></PrivateRoute>} />
-          <Route path="/cuadro-de-honor" element={<CuadroDeHonorPages />} />
-          <Route path="/horas-constitucionales" element={<HorasConstitucionalesPages />} />
+            <Route path="/bienestar" element={<PsicologiaPages />} />
+            <Route path="/portal-academico" element={<PortalAcademicoPages />} />
+            <Route path="/atencion-ciudadana" element={<AtencionCiudadanaPages />} />
+            <Route path="/HistoriaSimbolos" element={<HistoriaSimbolosPages />} />
+            <Route path="/galeria-completa" element={<GaleriaPages />} />
 
-        </Routes>
+            <Route path="/admin" element={<PrivateRoute><AdminPanel /></PrivateRoute>} />
+            <Route path="/cuadro-de-honor" element={<CuadroDeHonorPages />} />
+            <Route path="/horas-constitucionales" element={<HorasConstitucionalesPages />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+        </ErrorBoundary>
         
         <Footer />
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-
       </BrowserRouter>
     </div>
   );

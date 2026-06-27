@@ -10,7 +10,7 @@ export default function NosotrosSection() {
         <h2 className="section-title">Carta de Presentación</h2>
         <div className="divider"></div>
         <div className="about-grid">
-          <img src="/cancha.jpg" alt="Cancha" />
+          <img src="/cancha.webp" alt="Cancha" />
           <div className="about-text">
             <p>Población estudiantil: más de 3.000 estudiantes.</p>
             <p>Planta docente: 89 educadores, 3 coordinadores y 1 rector.</p>

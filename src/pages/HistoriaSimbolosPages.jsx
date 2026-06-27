@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import '../App.css'; 
@@ -44,16 +44,29 @@ export default function HistoriaSimbolosPages() {
     }
   ];
 
-  // Estado para la historia dinámica
   const [hitosHistoria, setHitosHistoria] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchHistory = async () => {
-      const { data, error } = await supabase.from('historia').select('*').order('año');
-      if (!error && data && data.length > 0) {
-        setHitosHistoria(data);
-      } else {
+      try {
+        const { data, error } = await supabase.from('historia').select('*').order('año');
+        if (error) throw error;
+        if (data && data.length > 0) {
+          const merged = new Map();
+          HITOS_ESTATICOS.forEach(h => merged.set(`${h.año}-${h.titulo}`, h));
+          data.forEach(h => merged.set(`${h.año}-${h.titulo}`, h));
+          setHitosHistoria(Array.from(merged.values()));
+        } else {
+          setHitosHistoria(HITOS_ESTATICOS);
+        }
+      } catch (err) {
+        console.error('Error fetching history:', err);
+        setError('No se pudieron cargar los datos históricos.');
         setHitosHistoria(HITOS_ESTATICOS);
+      } finally {
+        setLoading(false);
       }
     };
     fetchHistory();
@@ -72,7 +85,6 @@ export default function HistoriaSimbolosPages() {
     <main style={{ backgroundColor: 'var(--background)', padding: '4rem 1rem', minHeight: '100vh' }}>
       <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
         
-        {/* Encabezado */}
         <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
           <span style={{ fontSize: '0.875rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--primary)', backgroundColor: 'var(--muted)', padding: '6px 16px', borderRadius: '9999px' }}>
             Identidad Institucional
@@ -86,7 +98,6 @@ export default function HistoriaSimbolosPages() {
           </p>
         </div>
 
-        {/* Menú de pestañas */}
         <div role="tablist" style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', borderBottom: '2px solid #e2e8f0', marginBottom: '3rem' }}>
           <button
             onClick={() => setTabActiva('historia')}
@@ -94,8 +105,7 @@ export default function HistoriaSimbolosPages() {
             aria-selected={tabActiva === 'historia'}
             aria-controls="panel-historia"
             style={{
-              paddingBottom: '1rem',
-              paddingHorizontal: '1rem',
+              padding: '0 1rem 1rem',
               background: 'none',
               border: 'none',
               fontSize: '1.125rem',
@@ -115,8 +125,7 @@ export default function HistoriaSimbolosPages() {
             aria-selected={tabActiva === 'simbolos'}
             aria-controls="panel-simbolos"
             style={{
-              paddingBottom: '1rem',
-              paddingHorizontal: '1rem',
+              padding: '0 1rem 1rem',
               background: 'none',
               border: 'none',
               fontSize: '1.125rem',
@@ -132,10 +141,10 @@ export default function HistoriaSimbolosPages() {
           </button>
         </div>
 
-        {/* CONTENIDO 1: RESEÑA HISTÓRICA (Línea de tiempo usando tus tarjetas) */}
         {tabActiva === 'historia' && (
           <div id="panel-historia" role="tabpanel" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-            <img src="Fundador.jpeg" alt="Fundador del yepes" style={{ width: '50%', maxWidth: '180px', height: 'auto', display: 'block', margin: '0 auto', border: "150px"}} />
+            <img src="Fundador.jpeg" alt="Fundador del yepes" loading="lazy" style={{ width: '50%', maxWidth: '180px', height: 'auto', display: 'block', margin: '0 auto', borderRadius: '50%' }} />
+            {error && <p style={{ color: 'var(--destructive)', textAlign: 'center' }}>{error}</p>}
             <div className="card" style={{ padding: '24px' }}>
               <p style={{ color: 'var(--muted-text)', lineHeight: '1.7', margin: 0 }}>
                 El desarrollo de nuestro pueblo está basado profundamente en la educación, de ahí tantas luchas y batallas para que en nuestro municipio existiera un lugar digno en donde albergar a una población deseosa de adquirir conocimiento.
@@ -143,8 +152,8 @@ export default function HistoriaSimbolosPages() {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              {hitosHistoria.map((hito, idx) => (
-                <div key={idx} className="card" style={{ padding: '24px', borderLeft: '5px solid var(--primary)' }}>
+              {hitosHistoria.map((hito) => (
+                <div key={hito.id || `${hito.año}-${hito.titulo}`} className="card" style={{ padding: '24px', borderLeft: '5px solid var(--primary)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
                     <h3 style={{ margin: 0, color: 'var(--foreground)', fontSize: '1.3rem' }}>{hito.titulo}</h3>
                     <span style={{ backgroundColor: 'var(--primary)', color: 'var(--primary-fg)', padding: '4px 12px', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.9rem' }}>
@@ -156,7 +165,8 @@ export default function HistoriaSimbolosPages() {
                   </p>
                 </div>
               ))}
-            </div>            <div className="card featured-card" style={{ padding: '32px', textAlign: 'center', marginTop: '1rem' }}>
+            </div>
+            <div className="card featured-card" style={{ padding: '32px', textAlign: 'center', marginTop: '1rem' }}>
               <h3 style={{ marginTop: 0, marginBottom: '0.5rem' }}>La Institución Hoy</h3>
               <p style={{ color: '#e6f4ea', lineHeight: '1.6', margin: 0 }}>
                 Hoy la Institución Educativa Ignacio Yepes Yepes es uno de los lugares más importantes para nuestro municipio. Cuenta con la mayor población estudiantil y desarrolla múltiples procesos sociales, culturales, deportivos y formativos en una hermosa infraestructura rodeada de zonas verdes.
@@ -165,11 +175,10 @@ export default function HistoriaSimbolosPages() {
           </div>
         )}
 
-        {/* CONTENIDO 2: SÍMBOLOS INSTITUCIONALES */}
         {tabActiva === 'simbolos' && (
           <div id="panel-simbolos" role="tabpanel" style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
             
-            <img src="ESCUDO.png" alt="Escudo de la institución" style={{ width: '50%', maxWidth: '180px', height: 'auto', display: 'block', margin: '0 auto', border: "150px" }} />
+            <img src="/ESCUDO.webp" alt="Escudo de la institución" loading="lazy" style={{ width: '50%', maxWidth: '180px', height: 'auto', display: 'block', margin: '0 auto', borderRadius: '50%' }} />
             <div className="card" style={{ padding: '28px' }}>
               <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
                 <span style={{ fontSize: '0.85rem', fontWeight: '700', textTransform: 'uppercase', color: 'var(--primary)', letterSpacing: '0.05em' }}>Identidad Visual</span>
@@ -179,10 +188,9 @@ export default function HistoriaSimbolosPages() {
                 DISEÑADO POR: **Diego Juan Herrera**, estudiante del grado undécimo (11°). Está constituido por un sinnúmero de símbolos que esbozan principios y valores de quienes conforman la comunidad.
               </p>
               
-              {/* Cuadrícula de elementos del escudo */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
-                {simbolos.map((sym, idx) => (
-                  <div key={idx} className="card" style={{ padding: '20px', backgroundColor: 'var(--card)' }}>
+                {simbolos.map((sym) => (
+                  <div key={sym.nombre} className="card" style={{ padding: '20px', backgroundColor: 'var(--card)' }}>
                     <div style={{ fontSize: '1.75rem', marginBottom: '0.5rem' }}>{sym.icon}</div>
                     <h4 style={{ color: 'var(--primary)', margin: '0 0 0.5rem 0', fontSize: '1.1rem', fontWeight: '700' }}>{sym.nombre}</h4>
                     <p style={{ fontSize: '0.95rem', margin: 0, lineHeight: '1.5' }}>{sym.desc}</p>
@@ -191,7 +199,7 @@ export default function HistoriaSimbolosPages() {
               </div>
             </div>
 
-            <img src="Bandera.jpeg" alt="Bandera de la institución" style={{ width: '50%', maxWidth: '180px', height: 'auto', display: 'block', margin: '0 auto', border: "150px" }} />
+            <img src="Bandera.jpeg" alt="Bandera de la institución" loading="lazy" style={{ width: '50%', maxWidth: '180px', height: 'auto', display: 'block', margin: '0 auto', borderRadius: '50%' }} />
             <div className="card" style={{ padding: '28px' }}>
               <h2 style={{ color: 'var(--foreground)', marginTop: 0, marginBottom: '0.5rem', textAlign: 'center' }}>La Bandera</h2>
               <p style={{ textTransform: 'none', textAlign: 'center', fontSize: '0.95rem', color: 'var(--muted-text)' }}>
@@ -204,7 +212,6 @@ export default function HistoriaSimbolosPages() {
               </div>
             </div>
 
-            {/* El Lema */}
             <div className="card featured-card" style={{ padding: '32px', textAlign: 'center' }}>
               <span style={{ color: 'var(--accent)', fontWeight: '700', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>LEMA INSTITUTIONAL</span>
               <p style={{ fontSize: '1.75rem', fontStyle: 'italic', fontWeight: '700', margin: '0.75rem 0' }}>
@@ -218,7 +225,6 @@ export default function HistoriaSimbolosPages() {
           </div>
         )}
 
-        {/* Botón de regreso */}
         <div style={{ marginTop: '3rem', textAlign: 'center' }}>
           <Link to="/" className="btn">Volver al inicio</Link>
         </div>

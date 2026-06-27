@@ -5,7 +5,7 @@ export default function Hero() {
     <section className="hero" id="inicio">
       <img
         className="hero-bg"
-        src="/cancha.jpg"
+        src="/cancha.webp"
         alt="Fondo de la institución"
       />
       <div className="hero-overlay"></div>

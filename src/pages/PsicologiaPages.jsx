@@ -36,16 +36,26 @@ export default function PsicologiaPages() {
     }
   ];
 
-  // Estado para los temas dinámicos
   const [temas, setTemas] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchPsicologia = async () => {
-      const { data, error } = await supabase.from('psicologia').select('*');
-      if (!error && data && data.length > 0) {
-        setTemas(data);
-      } else {
+      try {
+        const { data, error } = await supabase.from('psicologia').select('*');
+        if (error) throw error;
+        if (data && data.length > 0) {
+          setTemas(data);
+        } else {
+          setTemas(TEMAS_ESTATICOS);
+        }
+      } catch (err) {
+        console.error('Error fetching psychology themes:', err);
+        setError('No se pudieron cargar los temas de orientación escolar.');
         setTemas(TEMAS_ESTATICOS);
+      } finally {
+        setLoading(false);
       }
     };
     fetchPsicologia();
@@ -60,6 +70,8 @@ export default function PsicologiaPages() {
           Tu salud mental y bienestar emocional son fundamentales. Explora nuestros recursos interactivos o solicita apoyo personalizado.
         </p>
       </div>
+
+      {error && <p style={{ color: 'var(--destructive)', textAlign: 'center', marginBottom: '1rem' }}>{error}</p>}
 
       <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
         {temas.map((tema) => (

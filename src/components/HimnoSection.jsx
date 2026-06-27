@@ -21,9 +21,6 @@ export default function HimnoSection() {
 
   const playAudio = () => {
     setIsPlaying(!isPlaying);
-    // TODO: Reemplazar con el URL del audio real
-    const audioUrl = 'PLACEHOLDER_AUDIO_URL';
-    console.log('Reproduciendo:', audioUrl);
   };
 
   return (
@@ -34,6 +31,7 @@ export default function HimnoSection() {
           <div className="divider" style={{ background: 'var(--accent)' }}></div>
           
           <div
+            onClick={playAudio}
             style={{
               position: 'relative',
               display: 'inline-flex',
@@ -99,8 +97,8 @@ export default function HimnoSection() {
         
         <div className="himno-box">
           <div className="himno-columns">
-            {himnos.map((stanza, index) => (
-              <div key={index} className="himno-stanza">
+            {himnos.map((stanza) => (
+              <div key={stanza.label} className="himno-stanza">
                 <div className="label">{stanza.label}</div>
                 <p style={{ whiteSpace: 'pre-line' }}>{stanza.text}</p>
               </div>

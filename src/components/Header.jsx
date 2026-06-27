@@ -1,33 +1,38 @@
 import '../App.css';
 import { useState, useEffect } from 'react';
 import { NavLink, Link } from 'react-router-dom';
+import { Sun, Moon, Menu, X, ChevronDown } from 'lucide-react';
 
-// Recibimos las propiedades desde App.jsx desestructurándolas en los parámetros
 export default function Header({ darkMode, setDarkMode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [mobileSection, setMobileSection] = useState(null);
 
   const toggleMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
+    setMobileMenuOpen(prev => !prev);
+    if (mobileMenuOpen) setMobileSection(null);
   };
 
   const closeMenu = () => {
     setMobileMenuOpen(false);
     setActiveDropdown(null);
+    setMobileSection(null);
   };
 
   const toggleDropdown = (e, name) => {
     e.preventDefault();
     e.stopPropagation();
-    setActiveDropdown(activeDropdown === name ? null : name);
+    setActiveDropdown(prev => prev === name ? null : name);
   };
 
-  // Función para alternar el estado del modo oscuro
+  const toggleMobileSection = (name) => {
+    setMobileSection(prev => prev === name ? null : name);
+  };
+
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
   };
 
-  // Cerrar dropdowns si se hace clic fuera
   useEffect(() => {
     const handleOutsideClick = () => setActiveDropdown(null);
     document.addEventListener('click', handleOutsideClick);
@@ -36,26 +41,25 @@ export default function Header({ darkMode, setDarkMode }) {
 
   return (
     <header className="navbar">
-      {/* Capa de oscurecimiento cuando hay un dropdown activo */}
-      <div 
-        className={`nav-overlay ${activeDropdown ? 'is-active' : ''}`} 
+      <div
+        className={`nav-overlay ${activeDropdown ? 'is-active' : ''}`}
         onClick={() => setActiveDropdown(null)}
-      ></div>
+      />
 
       <div className="navbar-inner container">
         <Link to="/" className="navbar-brand" onClick={closeMenu}>
           <span className="escudo">
-            <img className='logo' src="ESCUDO.png" alt="Escudo I.E. Ignacio Yepes Yepes" />
+            <img className="logo" src="/ESCUDO.webp" alt="Escudo I.E. Ignacio Yepes Yepes" />
           </span>
-          I.E. Ignacio Yepes Yepes
+          <span className="brand-text">I.E. Ignacio Yepes Yepes</span>
         </Link>
-        
+
         <nav className="nav-links" aria-label="Navegación principal">
           <NavLink to="/" end>Inicio</NavLink>
-          
+
           <div className={`nav-dropdown ${activeDropdown === 'institucion' ? 'is-open' : ''}`}>
             <span className="dropdown-trigger" onClick={(e) => toggleDropdown(e, 'institucion')}>
-              Institución <span className="dropdown-arrow">▾</span>
+              Institución <ChevronDown size={14} className="dropdown-arrow" />
             </span>
             <div className="dropdown-menu">
               <NavLink to="/HistoriaSimbolos" className="dropdown-item" onClick={closeMenu}>Historia y Símbolos</NavLink>
@@ -67,7 +71,7 @@ export default function Header({ darkMode, setDarkMode }) {
 
           <div className={`nav-dropdown ${activeDropdown === 'academico' ? 'is-open' : ''}`}>
             <span className="dropdown-trigger" onClick={(e) => toggleDropdown(e, 'academico')}>
-              Académico <span className="dropdown-arrow">▾</span>
+              Académico <ChevronDown size={14} className="dropdown-arrow" />
             </span>
             <div className="dropdown-menu">
               <NavLink to="/portal-academico" className="dropdown-item" onClick={closeMenu}>Portal Académico</NavLink>
@@ -79,15 +83,15 @@ export default function Header({ darkMode, setDarkMode }) {
 
           <div className={`nav-dropdown ${activeDropdown === 'comunidad' ? 'is-open' : ''}`}>
             <span className="dropdown-trigger" onClick={(e) => toggleDropdown(e, 'comunidad')}>
-              Comunidad <span className="dropdown-arrow">▾</span>
+              Comunidad <ChevronDown size={14} className="dropdown-arrow" />
             </span>
             <div className="dropdown-menu">
               <NavLink to="/bienestar" className="dropdown-item" onClick={closeMenu}>Bienestar Estudiantil</NavLink>
               <NavLink to="/atencion-ciudadana" className="dropdown-item" onClick={closeMenu}>Atención Ciudadana</NavLink>
-              <a 
-                href="https://remedios-antioquia.gov.co" 
-                target="_blank" 
-                rel="noopener noreferrer" 
+              <a
+                href="https://remedios-antioquia.gov.co"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="dropdown-item" onClick={closeMenu}
               >
                 Alcaldía de Remedios ↗
@@ -95,56 +99,94 @@ export default function Header({ darkMode, setDarkMode }) {
             </div>
           </div>
 
-          <NavLink to="/admin" className="admin-link">Admin</NavLink>
+          <Link to="/admin" className="admin-link" onClick={closeMenu}>
+            Panel Admin
+          </Link>
 
-          {/* BOTÓN MODO OSCURO (ESCRITORIO) */}
-          <button 
-            onClick={toggleDarkMode} 
+          <button
+            onClick={toggleDarkMode}
             className="dark-mode-toggle"
             type="button"
-            aria-label="Cambiar modo de color"
+            aria-label={darkMode ? 'Activar modo claro' : 'Activar modo oscuro'}
           >
-            {darkMode ? '☀️' : '🌙'}
+            {darkMode ? <Sun size={18} /> : <Moon size={18} />}
           </button>
         </nav>
-        
-        <button 
-          className="hamburger" 
-          type="button" 
-          onClick={toggleMenu}
-          aria-label="Abrir menú"
-          aria-controls="mobile-menu-container"
-          aria-expanded={mobileMenuOpen}
-        >
-          {mobileMenuOpen ? '✕' : '☰'}
-        </button>
+
+        <div className="navbar-actions">
+          <button
+            onClick={toggleDarkMode}
+            className="dark-mode-toggle-mobile-btn"
+            type="button"
+            aria-label={darkMode ? 'Activar modo claro' : 'Activar modo oscuro'}
+          >
+            {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+          <button
+            className="hamburger"
+            type="button"
+            onClick={toggleMenu}
+            aria-label="Abrir menú"
+            aria-controls="mobile-menu-container"
+            aria-expanded={mobileMenuOpen}
+          >
+            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
       </div>
-      
-      <div 
+
+      <div
         id="mobile-menu-container"
         className={`mobile-menu ${mobileMenuOpen ? 'open' : ''}`}
       >
-          <Link to="/" onClick={closeMenu}>Inicio</Link>
-          <NavLink to="/HistoriaSimbolos" onClick={closeMenu}>Institución (Historia y Símbolos)</NavLink>
-          <NavLink to="/sedes" onClick={closeMenu}>Sedes Educativas</NavLink>
-          <NavLink to="/galeria-completa" onClick={closeMenu}>Galería Institucional</NavLink>
-          <Link to="/docencia" onClick={closeMenu}>Docencia</Link>
-          <Link to="/bienestar" onClick={closeMenu}>Bienestar Estudiantil</Link>
-          <Link to="/portal-academico" onClick={closeMenu}>Portal Académico</Link>
-          <Link to="/atencion-ciudadana" onClick={closeMenu}>Atención Ciudadana</Link>
-          <Link to="/cuadro-de-honor" onClick={closeMenu}>Cuadro de Honor</Link>
-          <Link to="/horas-constitucionales" onClick={closeMenu}>Horas Constitucionales</Link>
-          <Link to="/admin" onClick={closeMenu} className="admin-link-mobile">Acceso Administrativo</Link>
-
-          {/* BOTÓN MODO OSCURO (MÓVIL) */}
-          <button 
-            onClick={() => { toggleDarkMode(); closeMenu(); }} 
-            className="dark-mode-toggle-mobile"
-            type="button"
-          >
-            {darkMode ? '☀️ Cambiar a Modo Claro' : '🌙 Cambiar a Modo Oscuro'}
+        <div className="mobile-menu-header">
+          <button onClick={toggleDarkMode} className="mobile-dark-toggle" type="button">
+            {darkMode ? <Sun size={16} /> : <Moon size={16} />}
+            {darkMode ? 'Modo Claro' : 'Modo Oscuro'}
           </button>
         </div>
+
+        <div className="mobile-menu-body">
+          <Link to="/" onClick={closeMenu} className="mobile-link">Inicio</Link>
+
+          <div className={`mobile-section ${mobileSection === 'institucion' ? 'is-open' : ''}`}>
+            <button className="mobile-section-trigger" onClick={() => toggleMobileSection('institucion')} type="button">
+              Institución <ChevronDown size={16} className="mobile-section-arrow" />
+            </button>
+            <div className="mobile-section-content">
+              <NavLink to="/HistoriaSimbolos" onClick={closeMenu}>Historia y Símbolos</NavLink>
+              <NavLink to="/sedes" onClick={closeMenu}>Nuestras Sedes</NavLink>
+              <NavLink to="/galeria-completa" onClick={closeMenu}>Galería</NavLink>
+              <a href="/#nosotros" onClick={closeMenu}>Carta de Presentación</a>
+            </div>
+          </div>
+
+          <div className={`mobile-section ${mobileSection === 'academico' ? 'is-open' : ''}`}>
+            <button className="mobile-section-trigger" onClick={() => toggleMobileSection('academico')} type="button">
+              Académico <ChevronDown size={16} className="mobile-section-arrow" />
+            </button>
+            <div className="mobile-section-content">
+              <NavLink to="/portal-academico" onClick={closeMenu}>Portal Académico</NavLink>
+              <NavLink to="/docencia" onClick={closeMenu}>Equipo Docente</NavLink>
+              <NavLink to="/cuadro-de-honor" onClick={closeMenu}>Cuadro de Honor</NavLink>
+              <NavLink to="/horas-constitucionales" onClick={closeMenu}>Horas Legales</NavLink>
+            </div>
+          </div>
+
+          <div className={`mobile-section ${mobileSection === 'comunidad' ? 'is-open' : ''}`}>
+            <button className="mobile-section-trigger" onClick={() => toggleMobileSection('comunidad')} type="button">
+              Comunidad <ChevronDown size={16} className="mobile-section-arrow" />
+            </button>
+            <div className="mobile-section-content">
+              <NavLink to="/bienestar" onClick={closeMenu}>Bienestar Estudiantil</NavLink>
+              <NavLink to="/atencion-ciudadana" onClick={closeMenu}>Atención Ciudadana</NavLink>
+              <a href="https://remedios-antioquia.gov.co" target="_blank" rel="noopener noreferrer" onClick={closeMenu}>Alcaldía de Remedios ↗</a>
+            </div>
+          </div>
+
+          <Link to="/admin" onClick={closeMenu} className="mobile-admin-link">Panel de Administración</Link>
+        </div>
+      </div>
     </header>
   );
 }
