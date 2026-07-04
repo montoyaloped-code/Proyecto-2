@@ -443,7 +443,7 @@ export default function AdminPanel() {
   const handlePsicSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage('');
-    if (!psicIcon.trim() || !psicTitle.trim() || !psicShort.trim() || !psicDetails.trim()) return alert("Completa todos los campos.");
+    if (!psicTitle.trim() || !psicShort.trim() || !psicDetails.trim()) return alert("Completa todos los campos.");
     const payload = { icon: psicIcon.trim(), title: psicTitle.trim(), short: psicShort.trim(), details: psicDetails.trim() };
 
     try {

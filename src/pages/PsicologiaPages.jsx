@@ -88,7 +88,7 @@ export default function PsicologiaPages() {
             }}
             onClick={() => setActiveCard(activeCard === tema.id ? null : tema.id)}
           >
-            <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>{tema.icon}</div>
+            {tema.icon && <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>{tema.icon}</div>}
             <h3 style={{ color: 'var(--primary)', marginBottom: '0.75rem' }}>{tema.title}</h3>
             <p style={{ color: 'var(--muted-fg)', fontSize: '0.95rem' }}>{tema.short}</p>
             
