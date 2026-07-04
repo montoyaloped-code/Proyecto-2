@@ -51,3 +51,4 @@ VITE_SUPABASE_ANON_KEY=ey...
 
 1. Siempre responde en español
 2. NO hagas commit sin mi autorizador explicita
+3. los mensajes de los commit deben ser cortos y tecnicos

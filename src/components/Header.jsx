@@ -1,12 +1,22 @@
 import '../App.css';
 import { useState, useEffect } from 'react';
-import { NavLink, Link } from 'react-router-dom';
+import { NavLink, Link, useLocation } from 'react-router-dom';
 import { Sun, Moon, Menu, X, ChevronDown } from 'lucide-react';
 
 export default function Header({ darkMode, setDarkMode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [mobileSection, setMobileSection] = useState(null);
+  const location = useLocation();
+
+  const sectionRoutes = {
+    institucion: ['/HistoriaSimbolos', '/sedes', '/galeria-completa'],
+    academico: ['/portal-academico', '/docencia', '/cuadro-de-honor', '/horas-constitucionales'],
+    comunidad: ['/bienestar', '/atencion-ciudadana'],
+  };
+
+  const isSectionActive = (section) =>
+    sectionRoutes[section]?.some((route) => location.pathname === route);
 
   const toggleMenu = () => {
     setMobileMenuOpen(prev => !prev);
@@ -57,7 +67,7 @@ export default function Header({ darkMode, setDarkMode }) {
         <nav className="nav-links" aria-label="Navegación principal">
           <NavLink to="/" end>Inicio</NavLink>
 
-          <div className={`nav-dropdown ${activeDropdown === 'institucion' ? 'is-open' : ''}`}>
+          <div className={`nav-dropdown ${activeDropdown === 'institucion' ? 'is-open' : ''} ${isSectionActive('institucion') ? 'active-section' : ''}`}>
             <span className="dropdown-trigger" onClick={(e) => toggleDropdown(e, 'institucion')}>
               Institución <ChevronDown size={14} className="dropdown-arrow" />
             </span>
@@ -69,7 +79,7 @@ export default function Header({ darkMode, setDarkMode }) {
             </div>
           </div>
 
-          <div className={`nav-dropdown ${activeDropdown === 'academico' ? 'is-open' : ''}`}>
+          <div className={`nav-dropdown ${activeDropdown === 'academico' ? 'is-open' : ''} ${isSectionActive('academico') ? 'active-section' : ''}`}>
             <span className="dropdown-trigger" onClick={(e) => toggleDropdown(e, 'academico')}>
               Académico <ChevronDown size={14} className="dropdown-arrow" />
             </span>
@@ -81,7 +91,7 @@ export default function Header({ darkMode, setDarkMode }) {
             </div>
           </div>
 
-          <div className={`nav-dropdown ${activeDropdown === 'comunidad' ? 'is-open' : ''}`}>
+          <div className={`nav-dropdown ${activeDropdown === 'comunidad' ? 'is-open' : ''} ${isSectionActive('comunidad') ? 'active-section' : ''}`}>
             <span className="dropdown-trigger" onClick={(e) => toggleDropdown(e, 'comunidad')}>
               Comunidad <ChevronDown size={14} className="dropdown-arrow" />
             </span>
