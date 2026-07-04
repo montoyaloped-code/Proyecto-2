@@ -91,6 +91,13 @@ export default function AdminPanel() {
   const [sedeImgFile, setSedeImgFile] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
 
+  // --- Contacto State & Logic ---
+  const [contactos, setContactos] = useState([]);
+  const [contactIcon, setContactIcon] = useState('');
+  const [contactLabel, setContactLabel] = useState('');
+  const [contactValue, setContactValue] = useState('');
+  const [editingContactId, setEditingContactId] = useState(null);
+
   // ===================== FETCH FUNCTIONS =====================
 
   const fetchDocentes = async () => {
@@ -165,6 +172,15 @@ export default function AdminPanel() {
     }
   };
 
+  const fetchContactos = async () => {
+    const { data, error } = await supabase.from('contacto').select('*').order('orden');
+    if (error) {
+      console.error("Error fetching contactos:", error);
+    } else {
+      setContactos(data || []);
+    }
+  };
+
   // ===================== INIT =====================
 
   useEffect(() => {
@@ -177,7 +193,8 @@ export default function AdminPanel() {
         fetchHistory(),
         fetchPsicologia(),
         fetchTransparencia(),
-        fetchSedes()
+        fetchSedes(),
+        fetchContactos()
       ]);
       setLoading(false);
     };
@@ -566,26 +583,93 @@ export default function AdminPanel() {
     }
   };
 
+  // ===================== CONTACTO CRUD =====================
+
+  const handleContactoSubmit = async (e) => {
+    e.preventDefault();
+    setErrorMessage('');
+    if (!contactLabel.trim() || !contactValue.trim()) return alert("Completa el label y el valor del contacto.");
+
+    const payload = {
+      icon: contactIcon.trim(),
+      label: contactLabel.trim(),
+      value: contactValue.trim(),
+      orden: contactos.length + 1
+    };
+
+    try {
+      let operation;
+      if (editingContactId) {
+        operation = supabase.from('contacto').update(payload).eq('id', editingContactId);
+      } else {
+        operation = supabase.from('contacto').insert([payload]);
+      }
+      const { error } = await operation;
+      if (error) throw error;
+      setContactIcon(''); setContactLabel(''); setContactValue('');
+      setEditingContactId(null);
+      fetchContactos();
+    } catch (err) {
+      console.error("Error saving contact:", err);
+      setErrorMessage("Error al guardar el contacto. Intenta de nuevo.");
+    }
+  };
+
+  const deleteContacto = async (id) => {
+    if (window.confirm('¿Eliminar este dato de contacto?')) {
+      setErrorMessage('');
+      try {
+        const { error } = await supabase.from('contacto').delete().eq('id', id);
+        if (error) throw error;
+        fetchContactos();
+      } catch (err) {
+        console.error("Error deleting contact:", err);
+        setErrorMessage("Error al eliminar el contacto. Intenta de nuevo.");
+      }
+    }
+  };
+
   // ===================== RENDER =====================
 
   if (loading) {
     return (
-      <main className="container admin-panel-main">
-        <div className="spinner-container">
+      <div className="admin-layout" style={{ padding: '4rem 1rem' }}>
+        <div className="spinner-container" style={{ width: '100%' }}>
           <div className="spinner"></div>
         </div>
-      </main>
+      </div>
     );
   }
 
   return (
     <main className="container admin-panel-main">
-      <div className="section-head" style={{ textAlign: 'center', marginBottom: '3rem' }}>
-        <span className="eyebrow" style={{ color: 'var(--accent)' }}>Panel de Administración</span>
-        <h2 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)' }}>Gestión de Contenidos</h2>
-      </div>
+      <div className="admin-layout">
+        <aside className={`admin-sidebar ${adminMobileMenuOpen ? 'open' : ''}`}>
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+            <button onClick={() => handleTabClick('directivos')} className={`admin-sidebar-btn ${activeTab === 'directivos' ? 'active' : ''}`}>🏛️ Directivos</button>
+            <button onClick={() => handleTabClick('docentes')} className={`admin-sidebar-btn ${activeTab === 'docentes' ? 'active' : ''}`}>🧑‍🏫 Docentes</button>
+            <button onClick={() => handleTabClick('galeria')} className={`admin-sidebar-btn ${activeTab === 'galeria' ? 'active' : ''}`}>📸 Galería</button>
+            <button onClick={() => handleTabClick('historia')} className={`admin-sidebar-btn ${activeTab === 'historia' ? 'active' : ''}`}>📜 Historia</button>
+            <button onClick={() => handleTabClick('sedes')} className={`admin-sidebar-btn ${activeTab === 'sedes' ? 'active' : ''}`}>🏫 Sedes</button>
+            <button onClick={() => handleTabClick('psicologia')} className={`admin-sidebar-btn ${activeTab === 'psicologia' ? 'active' : ''}`}>🧠 Salud Mental</button>
+            <button onClick={() => handleTabClick('transparencia')} className={`admin-sidebar-btn ${activeTab === 'transparencia' ? 'active' : ''}`}>📂 Atención Ciudadana</button>
+            <button onClick={() => handleTabClick('cuadro-honor')} className={`admin-sidebar-btn ${activeTab === 'cuadro-honor' ? 'active' : ''}`}>🏆 Cuadro de Honor</button>
+            <button onClick={() => handleTabClick('constitucion')} className={`admin-sidebar-btn ${activeTab === 'constitucion' ? 'active' : ''}`}>⚖️ Horas Legales</button>
+            <button onClick={() => handleTabClick('contacto')} className={`admin-sidebar-btn ${activeTab === 'contacto' ? 'active' : ''}`}>📞 Contacto</button>
+          </nav>
+        </aside>
 
-      {errorMessage && (
+        {adminMobileMenuOpen && (
+          <div className="admin-sidebar-overlay open" onClick={() => setAdminMobileMenuOpen(false)} />
+        )}
+
+        <div className="admin-content">
+          <div className="section-head" style={{ textAlign: 'center', marginBottom: '2rem' }}>
+            <span className="eyebrow" style={{ color: 'var(--accent)' }}>Panel de Administración</span>
+            <h2 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)' }}>Gestión de Contenidos</h2>
+          </div>
+
+          {errorMessage && (
         <div style={{
           background: 'var(--destructive)',
           color: '#fff',
@@ -615,26 +699,14 @@ export default function AdminPanel() {
       )}
 
       <button
-        className="admin-hamburger"
+        className="admin-sidebar-toggle"
         type="button"
         onClick={toggleAdminMobileMenu}
         aria-label="Abrir menú de administración"
         aria-expanded={adminMobileMenuOpen}
       >
-        {adminMobileMenuOpen ? <><X size={18} /> Cerrar Menú</> : <><Menu size={18} /> Gestión de Contenidos</>}
+        {adminMobileMenuOpen ? <><X size={18} /> Cerrar Menú</> : <><Menu size={18} /> Menú</>}
       </button>
-
-      <div className={`admin-tabs-nav ${adminMobileMenuOpen ? 'open' : ''}`}>
-        <button onClick={() => handleTabClick('directivos')} className={`admin-tab-button ${activeTab === 'directivos' ? 'active' : ''}`}>🏛️ Directivos</button>
-        <button onClick={() => handleTabClick('docentes')} className={`admin-tab-button ${activeTab === 'docentes' ? 'active' : ''}`}>🧑‍🏫 Docentes</button>
-        <button onClick={() => handleTabClick('galeria')} className={`admin-tab-button ${activeTab === 'galeria' ? 'active' : ''}`}>📸 Galería</button>
-        <button onClick={() => handleTabClick('historia')} className={`admin-tab-button ${activeTab === 'historia' ? 'active' : ''}`}>📜 Historia</button>
-        <button onClick={() => handleTabClick('sedes')} className={`admin-tab-button ${activeTab === 'sedes' ? 'active' : ''}`}>🏫 Sedes</button>
-        <button onClick={() => handleTabClick('psicologia')} className={`admin-tab-button ${activeTab === 'psicologia' ? 'active' : ''}`}>🧠 Salud Mental</button>
-        <button onClick={() => handleTabClick('transparencia')} className={`admin-tab-button ${activeTab === 'transparencia' ? 'active' : ''}`}>📂 Atención Ciudadana</button>
-        <button onClick={() => handleTabClick('cuadro-honor')} className={`admin-tab-button ${activeTab === 'cuadro-honor' ? 'active' : ''}`}>🏆 Cuadro de Honor</button>
-        <button onClick={() => handleTabClick('constitucion')} className={`admin-tab-button ${activeTab === 'constitucion' ? 'active' : ''}`}>⚖️ Horas Legales</button>
-      </div>
 
       {activeTab === 'directivos' && (
         <section>
@@ -1082,6 +1154,47 @@ export default function AdminPanel() {
           </div>
         </section>
       )}
+
+      {activeTab === 'contacto' && (
+        <section>
+          <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1.5rem', color: 'var(--primary)' }}>Gestión de Información de Contacto</h3>
+          <form onSubmit={handleContactoSubmit} className="admin-form">
+            <div className="form-row">
+              <div className="form-group">
+                <label>Icono (Emoji)</label>
+                <input type="text" placeholder="📍" value={contactIcon} onChange={e => setContactIcon(e.target.value)} />
+              </div>
+              <div className="form-group">
+                <label>Etiqueta</label>
+                <input type="text" required placeholder="Ej: Dirección" value={contactLabel} onChange={e => setContactLabel(e.target.value)} />
+              </div>
+            </div>
+            <div className="form-group">
+              <label>Valor</label>
+              <input type="text" required placeholder="Ej: Calle 123 #45-67" value={contactValue} onChange={e => setContactValue(e.target.value)} />
+            </div>
+            <button type="submit" className="btn-submit">
+              {editingContactId ? 'Guardar Cambios' : 'Agregar Contacto'}
+            </button>
+          </form>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem', marginTop: '2rem' }}>
+            {contactos.map((c) => (
+              <div key={c.id} className="card" style={{ padding: '1.5rem' }}>
+                <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{c.icon}</div>
+                <h4 style={{ color: 'var(--primary)', margin: 0 }}>{c.label}</h4>
+                <p style={{ fontSize: '0.9rem', color: 'var(--muted-text)' }}>{c.value}</p>
+                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+                  <button onClick={() => { setEditingContactId(c.id); setContactIcon(c.icon); setContactLabel(c.label); setContactValue(c.value); }} className="btn" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}>Editar</button>
+                  <button onClick={() => deleteContacto(c.id)} className="btn" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', background: 'var(--destructive)' }}>Eliminar</button>
+                </div>
+              </div>
+            ))}
+            {contactos.length === 0 && <p style={{ textAlign: 'center', color: 'var(--muted-fg)', gridColumn: '1 / -1' }}>No hay datos de contacto. Agrega uno arriba.</p>}
+          </div>
+        </section>
+      )}
+        </div>
+      </div>
     </main>
   );
 }
