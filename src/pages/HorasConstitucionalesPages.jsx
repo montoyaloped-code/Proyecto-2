@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import '../App.css';
 
 export default function HorasConstitucionalesPages() {
+  useEffect(() => { document.title = 'Horas Legales | I.E. Ignacio Yepes Yepes'; }, []);
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);

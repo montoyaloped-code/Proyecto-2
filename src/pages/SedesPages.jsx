@@ -3,156 +3,11 @@ import { supabase } from '../supabaseClient';
 import '../App.css';
 import '../sedes-style.css';
 
-const INITIAL_SEDES = [
-  {
-    slug: "liceo-principal",
-    name: "Liceo Ignacio Yepes Yepes",
-    tipo: "Urbana",
-    location: "Zona urbana, Remedios, Antioquia",
-    students: 1000,
-    img: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1200&q=80",
-    description: [
-      "Sede principal de la institución y eje articulador de todo el proyecto educativo. Atiende los niveles de básica secundaria y media, formando jóvenes con sólidos valores académicos, humanos y ciudadanos.",
-      "Cuenta con la infraestructura más amplia del municipio, espacios deportivos, laboratorios y una comunidad educativa comprometida con la excelencia."
-    ],
-    infra: { salones: 28, cancha: true, informatica: true, extras: ["Biblioteca", "Laboratorio de ciencias", "Auditorio"] }
-  },
-  {
-    slug: "eu-remedios",
-    name: "E.U. Remedios",
-    tipo: "Urbana",
-    location: "Casco urbano, Remedios, Antioquia",
-    students: 300,
-    img: "https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=1200&q=80",
-    description: [
-      "Escuela urbana dedicada a la formación de niños y niñas en preescolar y básica primaria, ubicada estratégicamente en el centro del municipio.",
-      "Su enfoque pedagógico promueve la lectura, el juego y el desarrollo de competencias básicas en un ambiente cálido y seguro."
-    ],
-    infra: { salones: 12, cancha: true, informatica: true, extras: ["Restaurante escolar"] }
-  },
-  {
-    slug: "eu-santa-teresita",
-    name: "E.U. Santa Teresita",
-    tipo: "Urbana",
-    location: "Barrio Santa Teresita, Remedios",
-    students: 250,
-    img: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=1200&q=80",
-    description: [
-      "Sede urbana que acompaña la primera infancia y la básica primaria en el barrio Santa Teresita, con una propuesta cercana a las familias.",
-      "Trabaja por una educación inclusiva, fortaleciendo los valores, la convivencia y las competencias comunicativas."
-    ],
-    infra: { salones: 10, cancha: true, informatica: true }
-  },
-  {
-    slug: "cer-la-ceiba",
-    name: "C.E.R. La Ceiba",
-    tipo: "Rural",
-    location: "Vereda La Ceiba, Remedios",
-    students: 120,
-    img: "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1200&q=80",
-    description: [
-      "Centro educativo rural ubicado en la vereda La Ceiba, donde se imparte preescolar y básica primaria bajo el modelo de Escuela Nueva.",
-      "Su quehacer pedagógico integra el contexto campesino, promoviendo el respeto por la tierra, la familia y el trabajo comunitario."
-    ],
-    infra: { salones: 4, cancha: true, informatica: false, extras: ["Huerta escolar"] }
-  },
-  {
-    slug: "cer-la-cruz",
-    name: "C.E.R. La Cruz",
-    tipo: "Rural",
-    location: "Vereda La Cruz, Remedios",
-    students: 100,
-    img: "https://images.unsplash.com/photo-1488190211105-8a0e65b04d4e?w=1200&q=80",
-    description: [
-      "Sede rural que brinda educación preescolar y primaria a los niños y niñas de la vereda La Cruz y comunidades cercanas.",
-      "Promueve la formación en valores, el cuidado del medio ambiente y el arraigo por las tradiciones campesinas."
-    ],
-    infra: { salones: 3, cancha: true, informatica: false }
-  },
-  {
-    slug: "cer-la-gorgona",
-    name: "C.E.R. La Gorgona",
-    tipo: "Rural",
-    location: "Vereda La Gorgona, Remedios",
-    students: 90,
-    img: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1200&q=80",
-    description: [
-      "Centro educativo rural que atiende a la población infantil de la vereda La Gorgona con metodología flexible adaptada al contexto rural.",
-      "Su propuesta combina el aprendizaje académico con proyectos productivos y ambientales propios de la zona."
-    ],
-    infra: { salones: 3, cancha: true, informatica: true }
-  },
-  {
-    slug: "cer-canaveral",
-    name: "C.E.R. Cañaveral",
-    tipo: "Rural",
-    location: "Vereda Cañaveral, Remedios",
-    students: 80,
-    img: "https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=1200&q=80",
-    description: [
-      "Sede rural enclavada en la vereda Cañaveral, comprometida con una educación pertinente y de calidad para la niñez campesina.",
-      "Fomenta valores como la solidaridad, el esfuerzo y la responsabilidad, en estrecha relación con las familias del territorio."
-    ],
-    infra: { salones: 3, cancha: true, informatica: false }
-  },
-  {
-    slug: "cer-el-popero",
-    name: "C.E.R. El Popero",
-    tipo: "Rural",
-    location: "Vereda El Popero, Remedios",
-    students: 70,
-    img: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200&q=80",
-    description: [
-      "Centro educativo de la vereda El Popero que ofrece formación primaria con un enfoque centrado en el estudiante y su entorno.",
-      "Trabaja por el fortalecimiento de la lectura, la escritura y el pensamiento lógico desde los primeros años escolares."
-    ],
-    infra: { salones: 2, cancha: true, informatica: false }
-  },
-  {
-    slug: "cer-martana",
-    name: "C.E.R. Martaná",
-    tipo: "Rural",
-    location: "Vereda Martaná, Remedios",
-    students: 60,
-    img: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1200&q=80",
-    description: [
-      "Sede rural que acompaña a los niños y niñas de la vereda Martaná en su proceso de formación inicial y básica primaria.",
-      "Su propuesta pedagógica resalta el valor de la comunidad, la cultura local y la convivencia pacífica."
-    ],
-    infra: { salones: 2, cancha: true, informatica: false }
-  },
-  {
-    slug: "cer-paso-de-la-mula",
-    name: "C.E.R. Paso de la Mula",
-    tipo: "Rural",
-    location: "Vereda Paso de la Mula, Remedios",
-    students: 65,
-    img: "https://images.unsplash.com/photo-1488190211105-8a0e65b04d4e?w=1200&q=80",
-    description: [
-      "Centro educativo rural de la vereda Paso de la Mula, que ofrece educación preescolar y básica primaria a la población campesina de la zona.",
-      "Su propuesta pedagógica fortalece la identidad territorial, el trabajo en equipo y las competencias básicas de los estudiantes rurales."
-    ],
-    infra: { salones: 2, cancha: true, informatica: false }
-  },
-  {
-    slug: "cer-santa-lucia",
-    name: "C.E.R. Santa Lucía",
-    tipo: "Rural",
-    location: "Vereda Santa Lucía, Remedios",
-    students: 70,
-    img: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1200&q=80",
-    description: [
-      "Sede rural ubicada en la vereda Santa Lucía, comprometida con la formación integral de niños y niñas en preescolar y básica primaria.",
-      "Integra el aprendizaje académico con proyectos productivos como la huerta escolar, fomentando el amor por la tierra y el trabajo comunitario."
-    ],
-    infra: { salones: 2, cancha: true, informatica: false, extras: ["Huerta escolar"] }
-  }
-];
-
 export default function Sedes() {
+  useEffect(() => { document.title = 'Nuestras Sedes | I.E. Ignacio Yepes Yepes'; }, []);
   const [activeFilter, setActiveFilter] = useState('all');
   const [selectedSede, setSelectedSede] = useState(null);
-  const [sedesData, setSedesData] = useState(INITIAL_SEDES);
+  const [sedesData, setSedesData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -161,12 +16,7 @@ export default function Sedes() {
       try {
         const { data, error } = await supabase.from('sedes').select('*');
         if (error) throw error;
-        if (data && data.length > 0) {
-          const merged = new Map();
-          INITIAL_SEDES.forEach(s => merged.set(s.slug, s));
-          data.forEach(s => merged.set(s.slug, s));
-          setSedesData(Array.from(merged.values()));
-        }
+        setSedesData(data || []);
       } catch (err) {
         console.error('Error fetching sedes:', err);
         setError('No se pudieron cargar las sedes.');

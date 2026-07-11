@@ -2,7 +2,44 @@
 -- Ejecutar en SQL Editor de Supabase
 
 -- ============================================
--- 1. ACTIVAR RLS EN CADA TABLA
+-- 1. TABLAS NUEVAS (contacto + pqrs)
+-- ============================================
+
+CREATE TABLE contacto (
+  id BIGSERIAL PRIMARY KEY,
+  direccion TEXT NOT NULL DEFAULT '',
+  telefono TEXT NOT NULL DEFAULT '',
+  celular TEXT NOT NULL DEFAULT '',
+  correo TEXT NOT NULL DEFAULT '',
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE contacto ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Lectura pública contacto" ON contacto FOR SELECT USING (true);
+CREATE POLICY "Escritura autenticados contacto" ON contacto FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "Actualización autenticados contacto" ON contacto FOR UPDATE USING (auth.role() = 'authenticated');
+CREATE POLICY "Eliminación autenticados contacto" ON contacto FOR DELETE USING (auth.role() = 'authenticated');
+
+CREATE TABLE pqrs (
+  id BIGSERIAL PRIMARY KEY,
+  nombre TEXT NOT NULL,
+  correo TEXT NOT NULL,
+  tipo TEXT NOT NULL DEFAULT 'Sugerencia',
+  mensaje TEXT NOT NULL,
+  leido BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE pqrs ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Cualquiera puede insertar PQRS" ON pqrs FOR INSERT WITH CHECK (true);
+CREATE POLICY "Solo admins pueden ver PQRS" ON pqrs FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "Solo admins pueden actualizar PQRS" ON pqrs FOR UPDATE USING (auth.role() = 'authenticated');
+CREATE POLICY "Solo admins pueden eliminar PQRS" ON pqrs FOR DELETE USING (auth.role() = 'authenticated');
+
+-- ============================================
+-- 2. ACTIVAR RLS EN CADA TABLA EXISTENTE
 -- ============================================
 ALTER TABLE docentes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE directivos ENABLE ROW LEVEL SECURITY;
@@ -84,3 +121,27 @@ CREATE POLICY "Eliminación autenticados psicologia" ON psicologia
   FOR DELETE USING (auth.role() = 'authenticated');
 CREATE POLICY "Eliminación autenticados transparencia" ON transparencia
   FOR DELETE USING (auth.role() = 'authenticated');
+
+-- ============================================
+-- 6. STORAGE BUCKET: documentos
+-- ============================================
+
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('documentos', 'documentos', true)
+ON CONFLICT (id) DO NOTHING;
+
+CREATE POLICY "Usuarios autenticados suben a documentos"
+ON storage.objects FOR INSERT
+WITH CHECK (bucket_id = 'documentos' AND auth.role() = 'authenticated');
+
+CREATE POLICY "Lectura pública documentos"
+ON storage.objects FOR SELECT
+USING (bucket_id = 'documentos');
+
+CREATE POLICY "Usuarios autenticados actualizan documentos"
+ON storage.objects FOR UPDATE
+USING (bucket_id = 'documentos' AND auth.role() = 'authenticated');
+
+CREATE POLICY "Usuarios autenticados eliminan documentos"
+ON storage.objects FOR DELETE
+USING (bucket_id = 'documentos' AND auth.role() = 'authenticated');

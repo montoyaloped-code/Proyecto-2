@@ -5,6 +5,7 @@ import { Menu, X } from 'lucide-react';
 import '../App.css';
 
 export default function AdminPanel() {
+  useEffect(() => { document.title = 'Panel Admin | I.E. Ignacio Yepes Yepes'; }, []);
   const [activeTab, setActiveTab] = useState('directivos');
   const [loading, setLoading] = useState(true);
 
@@ -81,6 +82,8 @@ export default function AdminPanel() {
   const [docSize, setDocSize] = useState('');
   const [docUrl, setDocUrl] = useState('');
   const [editingDocId, setEditingDocId] = useState(null);
+  const [docFile, setDocFile] = useState(null);
+  const [docUploading, setDocUploading] = useState(false);
 
   // --- Sedes State & Logic ---
   const [sedes, setSedes] = useState([]);
@@ -92,11 +95,14 @@ export default function AdminPanel() {
   const [errorMessage, setErrorMessage] = useState('');
 
   // --- Contacto State & Logic ---
-  const [contactos, setContactos] = useState([]);
-  const [contactIcon, setContactIcon] = useState('');
-  const [contactLabel, setContactLabel] = useState('');
-  const [contactValue, setContactValue] = useState('');
-  const [editingContactId, setEditingContactId] = useState(null);
+  const [contacto, setContacto] = useState(null);
+  const [contactDireccion, setContactDireccion] = useState('');
+  const [contactTelefono, setContactTelefono] = useState('');
+  const [contactCelular, setContactCelular] = useState('');
+  const [contactCorreo, setContactCorreo] = useState('');
+
+  // --- PQRS State ---
+  const [pqrsList, setPqrsList] = useState([]);
 
   // ===================== FETCH FUNCTIONS =====================
 
@@ -172,12 +178,26 @@ export default function AdminPanel() {
     }
   };
 
-  const fetchContactos = async () => {
-    const { data, error } = await supabase.from('contacto').select('*').order('orden');
-    if (error) {
-      console.error("Error fetching contactos:", error);
+  const fetchContacto = async () => {
+    const { data, error } = await supabase.from('contacto').select('*').limit(1).single();
+    if (error && error.code !== 'PGRST116') {
+      console.error("Error fetching contacto:", error);
     } else {
-      setContactos(data || []);
+      const c = data || {};
+      setContacto(c.id ? c : null);
+      setContactDireccion(c.direccion || '');
+      setContactTelefono(c.telefono || '');
+      setContactCelular(c.celular || '');
+      setContactCorreo(c.correo || '');
+    }
+  };
+
+  const fetchPqrs = async () => {
+    const { data, error } = await supabase.from('pqrs').select('*').order('created_at', { ascending: false });
+    if (error) {
+      console.error("Error fetching PQRS:", error);
+    } else {
+      setPqrsList(data || []);
     }
   };
 
@@ -194,7 +214,8 @@ export default function AdminPanel() {
         fetchPsicologia(),
         fetchTransparencia(),
         fetchSedes(),
-        fetchContactos()
+        fetchContacto(),
+        fetchPqrs()
       ]);
       setLoading(false);
     };
@@ -497,19 +518,65 @@ export default function AdminPanel() {
 
   // ===================== TRANSPARENCIA CRUD =====================
 
+  function formatFileSize(bytes) {
+    if (!bytes || bytes === 0) return '';
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1048576).toFixed(1) + ' MB';
+  }
+
+  const uploadDocument = async (file) => {
+    setDocUploading(true);
+    try {
+      const userId = (await supabase.auth.getUser()).data?.user?.id || 'anon';
+      const ext = file.name.split('.').pop();
+      const baseName = file.name.replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9._-]/g, '_').toLowerCase().slice(0, 60);
+      const filePath = `${userId}/${Date.now()}-${baseName}.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('documentos')
+        .upload(filePath, file, { cacheControl: '3600', upsert: false });
+
+      if (uploadError) throw uploadError;
+
+      const { data: publicUrlData } = supabase.storage
+        .from('documentos')
+        .getPublicUrl(filePath);
+
+      return { url: publicUrlData.publicUrl, filePath };
+    } finally {
+      setDocUploading(false);
+    }
+  };
+
   const handleDocSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage('');
-    if (!docName.trim() || !docSize.trim() || !docUrl.trim()) return alert("Completa todos los campos.");
-    const payload = { name: docName.trim(), size: docSize.trim(), url: docUrl.trim() };
+    if (!docName.trim()) return alert("El nombre del documento es obligatorio.");
 
     try {
+      let url = docUrl;
+      let filePath = null;
+
+      if (docFile) {
+        const result = await uploadDocument(docFile);
+        url = result.url;
+        filePath = result.filePath;
+      }
+
+      const payload = {
+        name: docName.trim(),
+        size: docFile ? formatFileSize(docFile.size) : docSize,
+        url,
+        ...(filePath ? { file_path: filePath } : {}),
+      };
+
       const { error } = editingDocId
         ? await supabase.from('transparencia').update(payload).eq('id', editingDocId)
         : await supabase.from('transparencia').insert([payload]);
       if (error) throw error;
       setEditingDocId(null);
-      setDocName(''); setDocSize(''); setDocUrl('');
+      setDocName(''); setDocSize(''); setDocUrl(''); setDocFile(null);
       fetchTransparencia();
     } catch (err) {
       console.error("Error saving document:", err);
@@ -517,11 +584,17 @@ export default function AdminPanel() {
     }
   };
 
-  const deleteDoc = async (id) => {
+  const deleteDoc = async (doc) => {
     if (window.confirm('¿Eliminar este documento de transparencia?')) {
       setErrorMessage('');
       try {
-        const { error } = await supabase.from('transparencia').delete().eq('id', id);
+        if (doc.file_path) {
+          const { error: storageError } = await supabase.storage
+            .from('documentos')
+            .remove([doc.file_path]);
+          if (storageError) console.error("Error deleting file from storage:", storageError);
+        }
+        const { error } = await supabase.from('transparencia').delete().eq('id', doc.id);
         if (error) throw error;
         fetchTransparencia();
       } catch (err) {
@@ -588,44 +661,53 @@ export default function AdminPanel() {
   const handleContactoSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage('');
-    if (!contactLabel.trim() || !contactValue.trim()) return alert("Completa el label y el valor del contacto.");
 
     const payload = {
-      icon: contactIcon.trim(),
-      label: contactLabel.trim(),
-      value: contactValue.trim(),
-      orden: contactos.length + 1
+      direccion: contactDireccion.trim(),
+      telefono: contactTelefono.trim(),
+      celular: contactCelular.trim(),
+      correo: contactCorreo.trim()
     };
 
     try {
-      let operation;
-      if (editingContactId) {
-        operation = supabase.from('contacto').update(payload).eq('id', editingContactId);
+      if (contacto?.id) {
+        const { error } = await supabase.from('contacto').update(payload).eq('id', contacto.id);
+        if (error) throw error;
       } else {
-        operation = supabase.from('contacto').insert([payload]);
+        const { error } = await supabase.from('contacto').insert([payload]);
+        if (error) throw error;
       }
-      const { error } = await operation;
-      if (error) throw error;
-      setContactIcon(''); setContactLabel(''); setContactValue('');
-      setEditingContactId(null);
-      fetchContactos();
+      fetchContacto();
     } catch (err) {
-      console.error("Error saving contact:", err);
-      setErrorMessage("Error al guardar el contacto. Intenta de nuevo.");
+      console.error("Error saving contacto:", err);
+      setErrorMessage("Error al guardar los datos de contacto.");
     }
   };
 
-  const deleteContacto = async (id) => {
-    if (window.confirm('¿Eliminar este dato de contacto?')) {
-      setErrorMessage('');
-      try {
-        const { error } = await supabase.from('contacto').delete().eq('id', id);
-        if (error) throw error;
-        fetchContactos();
-      } catch (err) {
-        console.error("Error deleting contact:", err);
-        setErrorMessage("Error al eliminar el contacto. Intenta de nuevo.");
-      }
+  // ===================== PQRS CRUD =====================
+
+  const togglePqrsLeido = async (id, leido) => {
+    setErrorMessage('');
+    try {
+      const { error } = await supabase.from('pqrs').update({ leido: !leido }).eq('id', id);
+      if (error) throw error;
+      fetchPqrs();
+    } catch (err) {
+      console.error("Error updating PQRS:", err);
+      setErrorMessage("Error al actualizar la solicitud.");
+    }
+  };
+
+  const deletePqrs = async (id) => {
+    if (!window.confirm('¿Eliminar esta solicitud PQRS?')) return;
+    setErrorMessage('');
+    try {
+      const { error } = await supabase.from('pqrs').delete().eq('id', id);
+      if (error) throw error;
+      fetchPqrs();
+    } catch (err) {
+      console.error("Error deleting PQRS:", err);
+      setErrorMessage("Error al eliminar la solicitud.");
     }
   };
 
@@ -656,6 +738,7 @@ export default function AdminPanel() {
             <button onClick={() => handleTabClick('cuadro-honor')} className={`admin-sidebar-btn ${activeTab === 'cuadro-honor' ? 'active' : ''}`}>🏆 Cuadro de Honor</button>
             <button onClick={() => handleTabClick('constitucion')} className={`admin-sidebar-btn ${activeTab === 'constitucion' ? 'active' : ''}`}>⚖️ Horas Legales</button>
             <button onClick={() => handleTabClick('contacto')} className={`admin-sidebar-btn ${activeTab === 'contacto' ? 'active' : ''}`}>📞 Contacto</button>
+            <button onClick={() => handleTabClick('pqrs')} className={`admin-sidebar-btn ${activeTab === 'pqrs' ? 'active' : ''}`}>📬 PQRS</button>
           </nav>
         </aside>
 
@@ -875,7 +958,7 @@ export default function AdminPanel() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {historyEvents.map((h) => (
               <div key={h.id} className="card" style={{ padding: '1.5rem', borderLeft: '5px solid var(--primary)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
                   <div>
                     <span style={{ background: 'var(--primary)', color: 'white', padding: '2px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold' }}>{h.año}</span>
                     <h4 style={{ color: 'var(--primary)', margin: '0.5rem 0' }}>{h.titulo}</h4>
@@ -895,7 +978,7 @@ export default function AdminPanel() {
 
       {activeTab === 'sedes' && (
         <section>
-          <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1.5rem', color: 'var(--primary)' }}>Gestión de Sedes Institucionales</h3>
+          <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1.5rem', color: 'var(--primary)', textAlign: 'center'}}>Gestión de Sedes Institucionales</h3>
 
           <form onSubmit={handleSedeSubmit} className="admin-form" style={{ border: '2px solid var(--accent)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
@@ -943,10 +1026,12 @@ export default function AdminPanel() {
               </div>
             </div>
             <textarea placeholder="Descripción detallada (cada párrafo en línea separada)" rows="3" required value={sedeForm.desc} onChange={e => setSedeForm({...sedeForm, desc: e.target.value})}></textarea>
-            <div className="form-row" style={{ alignItems: 'center' }}>
+            <div className="form-row">
               <input type="number" placeholder="N° Salones" value={sedeForm.salones} onChange={e => setSedeForm({...sedeForm, salones: e.target.value})} />
-              <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}><input type="checkbox" checked={sedeForm.cancha} onChange={e => setSedeForm({...sedeForm, cancha: e.target.checked})} /> Cancha</label>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}><input type="checkbox" checked={sedeForm.informatica} onChange={e => setSedeForm({...sedeForm, informatica: e.target.checked})} /> Informática</label>
+            </div>
+            <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', cursor: 'pointer' }}><input type="checkbox" checked={sedeForm.cancha} onChange={e => setSedeForm({...sedeForm, cancha: e.target.checked})} /> Cancha</label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', cursor: 'pointer' }}><input type="checkbox" checked={sedeForm.informatica} onChange={e => setSedeForm({...sedeForm, informatica: e.target.checked})} /> Informática</label>
             </div>
             <input type="text" placeholder="Extras (separados por coma: Biblioteca, Comedor, etc.)" value={sedeForm.extras} onChange={e => setSedeForm({...sedeForm, extras: e.target.value})} />
             <button type="submit" className="btn-submit" disabled={uploading}>
@@ -954,7 +1039,7 @@ export default function AdminPanel() {
             </button>
           </form>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1.5rem' }}>
             {sedes.map((s) => (
               <div key={s.id} className="card" style={{ padding: '1rem' }}>
                 <img src={s.img} alt={s.name} loading="lazy" style={{ width: '100%', height: '120px', objectFit: 'cover', borderRadius: '0.5rem' }} />
@@ -1039,18 +1124,18 @@ export default function AdminPanel() {
               <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.4rem' }}>Nombre del Documento / Archivo</label>
               <input type="text" required placeholder="Ej: Directorio Institucional 2026" style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)' }} value={docName} onChange={e => setDocName(e.target.value)} />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-              <div>
-                <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.4rem' }}>Tamaño (Ej: 310 KB)</label>
-                <input type="text" required placeholder="Ej: 310 KB" style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)' }} value={docSize} onChange={e => setDocSize(e.target.value)} />
-              </div>
-              <div>
-                <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.4rem' }}>URL del PDF (Drive/Enlace)</label>
-                <input type="url" required placeholder="https://..." style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border)' }} value={docUrl} onChange={e => setDocUrl(e.target.value)} />
-              </div>
+            <div>
+              <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '0.4rem' }}>Archivo PDF</label>
+              <input type="file" accept=".pdf,.doc,.docx" onChange={e => setDocFile(e.target.files[0])} style={{ width: '100%', padding: '0.5rem', borderRadius: '0.5rem', border: '1px solid var(--border)' }} />
+              {editingDocId && docUrl && !docFile && (
+                <span style={{ fontSize: '0.8rem', color: 'var(--muted-fg)' }}>Archivo actual: {docUrl.split('/').pop()} — Sube uno nuevo para reemplazarlo</span>
+              )}
+              {docFile && (
+                <span style={{ fontSize: '0.85rem', color: 'var(--accent)', marginTop: '0.3rem', display: 'block' }}>Archivo seleccionado: {docFile.name} ({formatFileSize(docFile.size)})</span>
+              )}
             </div>
-            <button type="submit" className="btn" style={{ background: 'var(--primary)', color: 'white', padding: '0.85rem' }}>
-              {editingDocId !== null ? 'Guardar Cambios' : 'Registrar Documento'}
+            <button type="submit" className="btn" style={{ background: 'var(--primary)', color: 'white', padding: '0.85rem' }} disabled={docUploading}>
+              {docUploading ? 'Subiendo archivo...' : editingDocId !== null ? 'Guardar Cambios' : 'Registrar Documento'}
             </button>
           </form>
 
@@ -1062,8 +1147,8 @@ export default function AdminPanel() {
                   <span style={{ fontSize: '0.8rem', color: 'var(--muted-fg)' }}>{d.size} · <a href={d.url} target="_blank" rel="noreferrer" style={{ color: 'var(--accent)', textDecoration: 'underline' }}>Ver archivo</a></span>
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <button onClick={() => { setEditingDocId(d.id); setDocName(d.name); setDocSize(d.size); setDocUrl(d.url); }} className="btn" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}>Editar</button>
-                  <button onClick={() => deleteDoc(d.id)} className="btn" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', background: 'var(--destructive)' }}>Eliminar</button>
+                  <button onClick={() => { setEditingDocId(d.id); setDocName(d.name); setDocSize(d.size); setDocUrl(d.url); setDocFile(null); }} className="btn" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}>Editar</button>
+                  <button onClick={() => deleteDoc(d)} className="btn" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', background: 'var(--destructive)' }}>Eliminar</button>
                 </div>
               </div>
             ))}
@@ -1158,39 +1243,115 @@ export default function AdminPanel() {
       {activeTab === 'contacto' && (
         <section>
           <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1.5rem', color: 'var(--primary)' }}>Gestión de Información de Contacto</h3>
+          <p style={{ fontSize: '0.9rem', color: 'var(--muted-fg)', marginBottom: '1.5rem' }}>
+            Actualiza los datos que aparecen en la sección de contacto de la página principal.
+          </p>
           <form onSubmit={handleContactoSubmit} className="admin-form">
+            <div className="form-group">
+              <label>Dirección</label>
+              <input type="text" placeholder="Ej: Circular 8 N° 15-149, Barrio San Nicolás" value={contactDireccion} onChange={e => setContactDireccion(e.target.value)} />
+            </div>
             <div className="form-row">
               <div className="form-group">
-                <label>Icono (Emoji)</label>
-                <input type="text" placeholder="📍" value={contactIcon} onChange={e => setContactIcon(e.target.value)} />
+                <label>Teléfono</label>
+                <input type="text" placeholder="Ej: (605) 830-3314" value={contactTelefono} onChange={e => setContactTelefono(e.target.value)} />
               </div>
               <div className="form-group">
-                <label>Etiqueta</label>
-                <input type="text" required placeholder="Ej: Dirección" value={contactLabel} onChange={e => setContactLabel(e.target.value)} />
+                <label>Celular</label>
+                <input type="text" placeholder="Ej: 311 308 9234" value={contactCelular} onChange={e => setContactCelular(e.target.value)} />
               </div>
             </div>
             <div className="form-group">
-              <label>Valor</label>
-              <input type="text" required placeholder="Ej: Calle 123 #45-67" value={contactValue} onChange={e => setContactValue(e.target.value)} />
+              <label>Correo electrónico</label>
+              <input type="email" placeholder="Ej: inseyepesy@yahoo.es" value={contactCorreo} onChange={e => setContactCorreo(e.target.value)} />
             </div>
             <button type="submit" className="btn-submit">
-              {editingContactId ? 'Guardar Cambios' : 'Agregar Contacto'}
+              Guardar Datos de Contacto
             </button>
           </form>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem', marginTop: '2rem' }}>
-            {contactos.map((c) => (
-              <div key={c.id} className="card" style={{ padding: '1.5rem' }}>
-                <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{c.icon}</div>
-                <h4 style={{ color: 'var(--primary)', margin: 0 }}>{c.label}</h4>
-                <p style={{ fontSize: '0.9rem', color: 'var(--muted-text)' }}>{c.value}</p>
-                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
-                  <button onClick={() => { setEditingContactId(c.id); setContactIcon(c.icon); setContactLabel(c.label); setContactValue(c.value); }} className="btn" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}>Editar</button>
-                  <button onClick={() => deleteContacto(c.id)} className="btn" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', background: 'var(--destructive)' }}>Eliminar</button>
-                </div>
+          {contacto && (
+            <div className="card" style={{ padding: '1.5rem', marginTop: '2rem' }}>
+              <h4 style={{ color: 'var(--primary)', marginBottom: '1rem' }}>Vista previa</h4>
+              <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))' }}>
+                <div><strong>📍 Dirección:</strong> {contacto.direccion || '—'}</div>
+                <div><strong>📞 Teléfono:</strong> {contacto.telefono || '—'}</div>
+                <div><strong>📱 Celular:</strong> {contacto.celular || '—'}</div>
+                <div><strong>✉️ Correo:</strong> {contacto.correo || '—'}</div>
               </div>
-            ))}
-            {contactos.length === 0 && <p style={{ textAlign: 'center', color: 'var(--muted-fg)', gridColumn: '1 / -1' }}>No hay datos de contacto. Agrega uno arriba.</p>}
-          </div>
+            </div>
+          )}
+        </section>
+      )}
+
+      {activeTab === 'pqrs' && (
+        <section>
+          <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1.5rem', color: 'var(--primary)' }}>Solicitudes PQRS Recibidas</h3>
+          {pqrsList.length === 0 ? (
+            <p style={{ textAlign: 'center', color: 'var(--muted-fg)', padding: '3rem' }}>No hay solicitudes PQRS recibidas.</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {pqrsList.map((p) => (
+                <div
+                  key={p.id}
+                  className="card"
+                  style={{
+                    padding: '1.5rem',
+                    borderLeft: `5px solid ${p.leido ? 'var(--border)' : 'var(--accent)'}`,
+                    opacity: p.leido ? 0.75 : 1
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap' }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
+                        <strong style={{ fontSize: '1.05rem' }}>{p.nombre}</strong>
+                        <span style={{ fontSize: '0.8rem', color: 'var(--muted-fg)' }}>• {p.correo}</span>
+                        <span style={{
+                          background: p.leido ? 'var(--muted)' : 'var(--accent)',
+                          color: p.leido ? 'var(--muted-text)' : '#fff',
+                          padding: '0.15rem 0.6rem',
+                          borderRadius: '999px',
+                          fontSize: '0.75rem',
+                          fontWeight: 700
+                        }}>
+                          {p.tipo}
+                        </span>
+                        <span style={{
+                          background: p.leido ? 'var(--muted)' : '#e6f4ea',
+                          color: p.leido ? 'var(--muted-text)' : '#137333',
+                          padding: '0.15rem 0.6rem',
+                          borderRadius: '999px',
+                          fontSize: '0.75rem',
+                          fontWeight: 700
+                        }}>
+                          {p.leido ? 'Leído' : 'Nuevo'}
+                        </span>
+                      </div>
+                      <p style={{ margin: '0.5rem 0', fontSize: '0.95rem', whiteSpace: 'pre-wrap' }}>{p.mensaje}</p>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--muted-fg)' }}>
+                        {new Date(p.created_at).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
+                      <button
+                        onClick={() => togglePqrsLeido(p.id, p.leido)}
+                        className="btn"
+                        style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}
+                      >
+                        {p.leido ? '🙈 Marcar no leído' : '✅ Marcar leído'}
+                      </button>
+                      <button
+                        onClick={() => deletePqrs(p.id)}
+                        className="btn"
+                        style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', background: 'var(--destructive)', color: '#fff' }}
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </section>
       )}
         </div>

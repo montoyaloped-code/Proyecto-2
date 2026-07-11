@@ -54,15 +54,6 @@ a {
   color: inherit;
 }
 
-.logo {
-  width: auto;
-  height: auto;
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  display: block;
-}
-
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -333,31 +324,18 @@ body.dark .admin-link:hover {
   background: rgba(255, 255, 255, 0.25);
 }
 
-/* --- Escudo / Logo --- */
-.escudo {
+/* --- Logo --- */
+.logo {
   width: 44px;
   height: 44px;
-  min-width: 44px;
-  border-radius: 50%;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.95);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 5px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-.navbar-brand:hover .escudo {
-  transform: scale(1.05);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-}
-
-.escudo img {
-  width: 100%;
-  height: 100%;
   object-fit: contain;
+  flex-shrink: 0;
+  transition: transform 0.25s ease, filter 0.25s ease;
+}
+
+.navbar-brand:hover .logo {
+  transform: scale(1.05);
+  filter: brightness(1.1);
 }
 
 /* --- Nav Overlay --- */
@@ -676,11 +654,9 @@ body.dark .nav-dropdown.is-open .dropdown-trigger .dropdown-arrow {
     top: 60px;
   }
 
-  .escudo {
+  .logo {
     width: 36px;
     height: 36px;
-    min-width: 36px;
-    padding: 4px;
   }
 
   body {
@@ -2293,4 +2269,91 @@ body.dark .form-group input:focus {
   .logout-button {
     width: 100%;
   }
+}
+
+/* --- Admin panel mobile improvements --- */
+@media (max-width: 640px) {
+  .admin-panel-main {
+    padding: 2rem 0.75rem;
+  }
+
+  .admin-panel-main section {
+    padding: 1.25rem;
+    border-radius: 1rem;
+  }
+
+  .admin-panel-main section h3 {
+    font-size: 1.25rem;
+  }
+
+  .admin-form {
+    padding: 1rem;
+    gap: 0.85rem;
+  }
+
+  .admin-form label {
+    font-size: 0.9rem;
+  }
+
+  .admin-form input,
+  .admin-form select,
+  .admin-form textarea {
+    padding: 0.85rem 0.9rem;
+    font-size: 1rem;
+  }
+
+  .admin-form .form-row {
+    gap: 0.75rem;
+  }
+
+  .admin-panel-main .btn,
+  .admin-panel-main .btn-submit {
+    padding: 0.85rem 1.2rem;
+    font-size: 1rem;
+    width: 100%;
+  }
+}
+
+/* ===== MODAL VISOR PDF (Atención Ciudadana) ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal-content {
+  background: var(--card-bg, #ffffff);
+  border-radius: 0.75rem;
+  width: 100%;
+  max-width: 900px;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-footer {
+  padding: 0.75rem 1.5rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+}
+
+body.dark .modal-content {
+  background: #0a1a0d;
+  border: 1px solid var(--border);
 }

@@ -2,9 +2,8 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import '../App.css';
 
-const EMAIL_CONTACTO = import.meta.env.VITE_CONTACT_EMAIL || 'MontoyaLoped@gmail.com';
-
 export default function AtencionCiudadanaPages() {
+  useEffect(() => { document.title = 'Atención Ciudadana | I.E. Ignacio Yepes Yepes'; }, []);
   const [formState, setFormState] = useState({
     nombre: '',
     correo: '',
@@ -14,55 +13,43 @@ export default function AtencionCiudadanaPages() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setSubmitError('');
 
     const { nombre, correo, tipo, mensaje } = formState;
-    
-    const subject = `PQRS - ${tipo} de ${nombre}`;
-    const bodyText = `Nombre: ${nombre}\nCorreo: ${correo}\nTipo: ${tipo}\n\nMensaje:\n${mensaje}`;
-
-    const mailtoUrl = `mailto:${EMAIL_CONTACTO}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyText)}`;
 
     try {
-      window.location.href = mailtoUrl;
-    } catch (error) {
-      console.error('Error al abrir cliente de correo:', error);
+      const { error } = await supabase.from('pqrs').insert([
+        { nombre: nombre.trim(), correo: correo.trim(), tipo, mensaje: mensaje.trim() }
+      ]);
+
+      if (error) throw error;
+
+      setSubmitted(true);
+      setFormState({ nombre: '', correo: '', tipo: 'Sugerencia', mensaje: '' });
+      setTimeout(() => setSubmitted(false), 8000);
+    } catch (err) {
+      console.error('Error al enviar PQRS:', err);
+      setSubmitError('Error al enviar la solicitud. Intenta de nuevo más tarde.');
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setIsSubmitting(false);
-    setSubmitted(true);
-    setFormState({ nombre: '', correo: '', tipo: 'Sugerencia', mensaje: '' });
-    setTimeout(() => setSubmitted(false), 6000);
   };
-
-  const DOCUMENTOS_ESTATICOS = [
-    { name: "Directorio Institucional de Funcionarios 2026", size: "142 KB" },
-    { name: "Presupuesto General de Rentas y Gastos Autorizado", size: "310 KB" },
-    { name: "Resoluciones del Rector e Informes de Gestión Directiva", size: "1.2 MB" },
-    { name: "Rendición de Cuentas Anual y Ejecución Presupuestal", size: "845 KB" }
-  ];
 
   const [documentos, setDocumentos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchTransparencia = async () => {
       try {
-        const { data, error } = await supabase.from('transparencia').select('*');
-        if (error) throw error;
-        if (data && data.length > 0) {
-          setDocumentos(data);
-        } else {
-          setDocumentos(DOCUMENTOS_ESTATICOS);
-        }
+        const { data } = await supabase.from('transparencia').select('*');
+        setDocumentos(data || []);
       } catch (err) {
         console.error('Error fetching documentos:', err);
-        setError('No se pudieron cargar los documentos de transparencia.');
-        setDocumentos(DOCUMENTOS_ESTATICOS);
       } finally {
         setLoading(false);
       }
@@ -81,7 +68,7 @@ export default function AtencionCiudadanaPages() {
         </p>
       </div>
       <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '3rem', alignItems: 'flex-start' }}>
-        
+
         <section className="card" style={{ padding: '2.5rem 2rem' }}>
           <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1.5rem', color: 'var(--primary)' }}>
             Buzón Virtual de PQRS
@@ -117,12 +104,18 @@ export default function AtencionCiudadanaPages() {
             </div>
 
             <button type="submit" disabled={isSubmitting} className="btn" style={{ width: '100%', padding: '0.85rem', background: 'var(--primary)', color: 'var(--primary-fg)', fontWeight: 'bold', border: 'none', cursor: 'pointer' }}>
-              {isSubmitting ? "Preparando mensaje..." : "Enviar Solicitud Institucional"}
+              {isSubmitting ? "Enviando solicitud..." : "Enviar Solicitud Institucional"}
             </button>
 
             {submitted && (
-              <div role="alert" style={{ background: '#e6f4ea', border: '1px solid #137333', color: '#137333', padding: '1rem', borderRadius: '0.5rem', fontSize: '0.9rem', textAlign: 'center', marginTop: '0.5rem', fontWeight: 'bold' }}>
-                ✓ ¡Solicitud preparada! Revisa tu cliente de correo y envíala.
+              <div role="alert" style={{ background: '#e6f4ea', border: '1px solid #137333', color: '#137333', padding: '1rem', borderRadius: '0.5rem', fontSize: '0.9rem', textAlign: 'center', fontWeight: 'bold' }}>
+                ✓ ¡Solicitud enviada correctamente! La institución dará respuesta a la mayor brevedad.
+              </div>
+            )}
+
+            {submitError && (
+              <div role="alert" style={{ background: '#fce8e6', border: '1px solid #d93025', color: '#d93025', padding: '1rem', borderRadius: '0.5rem', fontSize: '0.9rem', textAlign: 'center' }}>
+                {submitError}
               </div>
             )}
           </form>
@@ -138,34 +131,37 @@ export default function AtencionCiudadanaPages() {
             </p>
           </div>
 
-          {error && <p style={{ color: 'var(--destructive)', textAlign: 'center' }}>{error}</p>}
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {documentos.map((doc) => (
-              <div 
-                key={doc.name} 
-                className="card" 
-                style={{ padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid var(--border)' }}
-              >
-                <div>
-                  <h4 style={{ fontSize: '0.98rem', margin: 0, color: 'var(--foreground)' }}>{doc.name}</h4>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--muted-fg)' }}>Formato: PDF · Tamaño: {doc.size}</span>
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '2rem' }}>
+              <div className="spinner" style={{ width: '2rem', height: '2rem', margin: '0 auto', borderWidth: '3px' }}></div>
+            </div>
+          ) : documentos.length === 0 ? (
+            <p style={{ textAlign: 'center', color: 'var(--muted-fg)', padding: '2rem' }}>
+              No hay documentos de transparencia disponibles por el momento.
+            </p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {documentos.map((doc) => (
+                <div
+                  key={doc.id}
+                  className="card"
+                  style={{ padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid var(--border)' }}
+                >
+                  <div>
+                    <h4 style={{ fontSize: '0.98rem', margin: 0, color: 'var(--foreground)' }}>{doc.name}</h4>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--muted-fg)' }}>Formato: PDF · Tamaño: {doc.size}</span>
+                  </div>
+                  {doc.url ? (
+                    <a href={doc.url} download style={{ background: 'rgba(201,149,43,0.1)', color: 'var(--accent)', textDecoration: 'none', padding: '0.6rem 0.8rem', borderRadius: '0.4rem', fontWeight: 'bold', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center' }}>
+                      📥 Descargar
+                    </a>
+                  ) : (
+                    <span style={{ fontSize: '0.8rem', color: 'var(--muted-fg)' }}>Próximamente</span>
+                  )}
                 </div>
-                {doc.url ? (
-                  <a href={doc.url} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(201,149,43,0.1)', color: 'var(--accent)', textDecoration: 'none', padding: '0.6rem 0.8rem', borderRadius: '0.4rem', fontWeight: 'bold', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center' }}>
-                    📥 Descargar
-                  </a>
-                ) : (
-                  <button 
-                    onClick={() => alert(`Archivo no disponible para descarga inmediata.`)}
-                    style={{ background: 'rgba(201,149,43,0.1)', border: 'none', color: 'var(--accent)', cursor: 'pointer', padding: '0.6rem 0.8rem', borderRadius: '0.4rem', fontWeight: 'bold', fontSize: '0.9rem' }}
-                  >
-                    📥 Descargar
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </section>
       </div>
     </main>

@@ -4,46 +4,8 @@ import { supabase } from '../supabaseClient';
 import '../App.css'; 
 
 export default function HistoriaSimbolosPages() {
+  useEffect(() => { document.title = 'Historia y Símbolos | I.E. Ignacio Yepes Yepes'; }, []);
   const [tabActiva, setTabActiva] = useState('historia');
-
-  const HITOS_ESTATICOS = [
-    {
-      año: "1939",
-      titulo: "Fundación y Primeros Pasos",
-      desc: "El Presbítero Ignacio María Yepes Yepes, junto al querido médico local Israel Londoño, funda un colegio con recursos propios en la casa cural bajo el nombre de 'San Nicolás de Tolentino'. En sus inicios peregrinó por múltiples locales del municipio, incluyendo la plazoleta de Santa Bárbara (antiguo local de 'El Neucido') y la plaza principal."
-    },
-    {
-      año: "1948",
-      titulo: "Nace la Escuela de Varones",
-      desc: "El 20 de enero inicia labores la Escuela Urbana de Varones bajo la dirección de Gabriel Valencia. En 1959, mediante la ordenanza 021, se autoriza su funcionamiento mixto bajo el nombre de 'Escuela Urbana Integrada Remedios', siendo impulsada en infraestructura por el destacado director Jairo Cadavid."
-    },
-    {
-      año: "1959",
-      titulo: "Legalización y Raíces Femeninas",
-      desc: "Se oficializa la 'Escuela de Niñas del Municipio de Remedios' mediante la Ordenanza Nº 21. Paralelamente, la Escuela Santa Teresita (cuyas escrituras datan de 1911 y 1897 en terrenos cedidos para niñas) es asumida y dirigida por la congregación de las Hermanas Teresitas del Niño Jesús."
-    },
-    {
-      año: "1963",
-      titulo: "La Gran Disputa y División",
-      desc: "El plantel resurge en el palacio municipal como 'Colegio de Francisco Martínez de Ospina'. Sin embargo, una fuerte disputa personal entre el alcalde de turno y el párroco Pbro. Ovidio Castro divide el colegio en dos facciones: una permanece en el palacio y la otra se traslada a la Casa Cural bajo la figura de 'Colegio Parroquial'."
-    },
-    {
-      año: "1966",
-      titulo: "Llegada al Alto de las Tapias",
-      desc: "La representación política y social unifica las fuerzas de la comunidad. Mediante el Acuerdo Nº 11 del Concejo Municipal, se ordena la edificación definitiva del plantel en el icónico Alto de las Tapias. Allí abre sus puertas con el nombre de 'Liceo Ignacio Yepes Yepes', rindiendo tributo eterno a su fundador."
-    },
-    {
-      año: "1976",
-      titulo: "Primera Promoción de Bachilleres",
-      desc: "Tras intensas visitas de inspección nacional que avalaron los estudios de primero a sexto de bachillerato, el 20 de noviembre de 1976 la institución otorga sus primeros títulos de bachiller, bajo la rectoría del señor Hugo de Jesús Castaño Hernández."
-    },
-    {
-      año: "2003",
-      titulo: "Fusión Definitiva: Nace la I.E.",
-      desc: "El 6 de febrero de 2003 se firma la histórica Resolución Departamental Nº 0815. Las escuelas urbanas integradas (Santa Teresita y Remedios) se unifican de forma definitiva con el Liceo, consolidando la estructura actual de la Institución Educativa Ignacio Yepes Yepes."
-    }
-  ];
-
   const [hitosHistoria, setHitosHistoria] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -53,18 +15,10 @@ export default function HistoriaSimbolosPages() {
       try {
         const { data, error } = await supabase.from('historia').select('*').order('año');
         if (error) throw error;
-        if (data && data.length > 0) {
-          const merged = new Map();
-          HITOS_ESTATICOS.forEach(h => merged.set(`${h.año}-${h.titulo}`, h));
-          data.forEach(h => merged.set(`${h.año}-${h.titulo}`, h));
-          setHitosHistoria(Array.from(merged.values()));
-        } else {
-          setHitosHistoria(HITOS_ESTATICOS);
-        }
+        setHitosHistoria(data || []);
       } catch (err) {
         console.error('Error fetching history:', err);
         setError('No se pudieron cargar los datos históricos.');
-        setHitosHistoria(HITOS_ESTATICOS);
       } finally {
         setLoading(false);
       }

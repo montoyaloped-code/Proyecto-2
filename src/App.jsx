@@ -63,6 +63,17 @@ function App() {
     }
   }, [darkMode]);
 
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      document.querySelectorAll('img:not([loading])').forEach(img => {
+        img.loading = 'lazy';
+        img.decoding = 'async';
+      });
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="app-container">
       <BrowserRouter>

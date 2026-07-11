@@ -4,6 +4,7 @@ import { supabase } from '../supabaseClient';
 import '../App.css';
 
 export default function GaleriaPages() {
+  useEffect(() => { document.title = 'Galería Institucional | I.E. Ignacio Yepes Yepes'; }, []);
   const [fotoActiva, setFotoActiva] = useState(null);
   const [galleryImages, setGalleryImages] = useState([]);
   const [loading, setLoading] = useState(true);

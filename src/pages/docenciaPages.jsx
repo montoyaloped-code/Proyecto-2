@@ -5,6 +5,7 @@ import '../App.css';
 import ModuloInduccion from '../components/ModuloInduccion';
 
 export default function DocenciaPages() {
+  useEffect(() => { document.title = 'Equipo Docente | I.E. Ignacio Yepes Yepes'; }, []);
   const [materiaAbierta, setMateriaAbierta] = useState(null);
   const [materiaHover, setMateriaHover] = useState(null);
   const [docentes, setDocentes] = useState([]);

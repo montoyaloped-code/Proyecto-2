@@ -4,14 +4,14 @@ import '../App.css';
 import { ContactCard } from './Card';
 
 export default function ContactoSection() {
-  const [contactos, setContactos] = useState([]);
+  const [contacto, setContacto] = useState(null);
 
   useEffect(() => {
-    const fetchContactos = async () => {
-      const { data } = await supabase.from('contacto').select('*').order('orden');
-      if (data) setContactos(data);
+    const fetchContacto = async () => {
+      const { data } = await supabase.from('contacto').select('*').limit(1).single();
+      if (data) setContacto(data);
     };
-    fetchContactos();
+    fetchContacto();
   }, []);
 
   return (
@@ -23,9 +23,10 @@ export default function ContactoSection() {
         <div className="contact-grid">
           <article className="contact-info">
             <h3>Información de contacto</h3>
-            {contactos.map((c) => (
-              <ContactCard key={c.id} icon={c.icon} label={c.label} text={c.value} />
-            ))}
+            <ContactCard icon="📍" label="Dirección" text={contacto?.direccion || ''} />
+            <ContactCard icon="📞" label="Teléfono" text={contacto?.telefono || ''} />
+            <ContactCard icon="📱" label="Celular" text={contacto?.celular || ''} />
+            <ContactCard icon="✉️" label="Correo" text={contacto?.correo || ''} />
           </article>
           <aside className="contact-map">
             <h3>Encuéntranos</h3>

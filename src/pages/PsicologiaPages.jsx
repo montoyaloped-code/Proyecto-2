@@ -3,6 +3,7 @@ import { supabase } from '../supabaseClient';
 import '../App.css';
 
 export default function PsicologiaPages() {
+  useEffect(() => { document.title = 'Bienestar Estudiantil | I.E. Ignacio Yepes Yepes'; }, []);
   const [activeCard, setActiveCard] = useState(null);
 
   const TEMAS_ESTATICOS = [

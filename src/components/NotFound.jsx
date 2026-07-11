@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 export default function NotFound() {
+  useEffect(() => { document.title = 'Página no encontrada | I.E. Ignacio Yepes Yepes'; }, []);
   return (
     <div style={{
       display: 'flex',

@@ -58,9 +58,7 @@ export default function Header({ darkMode, setDarkMode }) {
 
       <div className="navbar-inner container">
         <Link to="/" className="navbar-brand" onClick={closeMenu}>
-          <span className="escudo">
-            <img className="logo" src="/ESCUDO.webp" alt="Escudo I.E. Ignacio Yepes Yepes" />
-          </span>
+          <img className="logo" src="/ESCUDO.webp" alt="Escudo I.E. Ignacio Yepes Yepes" />
           <span className="brand-text">I.E. Ignacio Yepes Yepes</span>
         </Link>
 

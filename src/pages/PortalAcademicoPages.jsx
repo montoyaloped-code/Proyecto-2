@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import '../App.css';
 
 export default function PortalAcademicoPages() {
+  useEffect(() => { document.title = 'Portal Académico | I.E. Ignacio Yepes Yepes'; }, []);
   const [openFaq, setOpenFaq] = useState(null);
 
   const faqs = [

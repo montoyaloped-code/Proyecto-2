@@ -5,6 +5,7 @@ import '../App.css';
 const INTERVALO_MS = 5000;
 
 export default function CuadroDeHonorPages() {
+  useEffect(() => { document.title = 'Cuadro de Honor | I.E. Ignacio Yepes Yepes'; }, []);
   const [honorStudents, setHonorStudents] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
