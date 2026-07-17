@@ -46,7 +46,7 @@ export default function Footer() {
           <div>
             © {new Date().getFullYear()} I.E. Ignacio Yepes Yepes — Remedios, Antioquia
             <div className="footer-credit">
-              Desarrollado por <strong>Sergio Andres Montoya Lopez</strong>
+              Desarrollado por <strong><a href="https://portafolio-final-fawn.vercel.app/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'underline' }}>Sergio Andres Montoya Lopez</a></strong>
             </div>
           </div>
 

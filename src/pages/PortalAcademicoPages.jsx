@@ -67,14 +67,6 @@ export default function PortalAcademicoPages() {
           </div>
         </article>
 
-        <article className="timeline-item">
-          <span className="timeline-dot" style={{ background: 'var(--primary)' }}></span>
-          <span className="timeline-year" style={{ background: 'rgba(0,100,0,0.1)', color: 'var(--primary)' }}>03</span>
-          <h3>Descargar tus Boletines</h3>
-          <p style={{ color: 'var(--muted-fg)' }}>
-            Una vez accedas de forma exitosa, selecciona el rol correspondiente, navega hacia el módulo lateral de 'Informes o Calificaciones', selecciona el periodo lectivo en curso y genera tu reporte en formato PDF para impresión.
-          </p>
-        </article>
       </div>
 
       <div style={{ maxWidth: '700px', margin: '0 auto' }}>

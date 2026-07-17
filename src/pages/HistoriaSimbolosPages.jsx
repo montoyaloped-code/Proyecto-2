@@ -180,7 +180,11 @@ export default function HistoriaSimbolosPages() {
         )}
 
         <div style={{ marginTop: '3rem', textAlign: 'center' }}>
-          <Link to="/" className="btn">Volver al inicio</Link>
+          <Link to="/" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 'bold', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1.5rem', borderRadius: 'var(--radius)', border: '2px solid var(--primary)', transition: 'all 0.3s' }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'var(--primary)'; e.currentTarget.style.color = 'var(--primary-fg)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--primary)'; }}>
+            ← Volver al Inicio
+          </Link>
         </div>
 
       </div>

@@ -12,11 +12,9 @@ export default function NosotrosSection() {
         <div className="about-grid">
           <img src="/cancha.webp" alt="Cancha" />
           <div className="about-text">
-            <p>Población estudiantil: más de 3.000 estudiantes.</p>
-            <p>Planta docente: 89 educadores, 3 coordinadores y 1 rector.</p>
-            <p>Jornadas: mañana, tarde, noche (CLEI) y sabatino.</p>
-            <p>Oferta académica: preescolar, primaria, secundaria, media académica y Media Técnica en Administración y Finanzas.</p>
-            <p>Modelos educativos: tradicional, Escuela Nueva, post primaria, aceleración del aprendizaje y CLEI.</p>
+            <p>La Institución Educativa Ignacio Yepes Yepes, ubicada en el municipio de Remedios, Nordeste Antioqueño, nació en 1939 por iniciativa del Presbítero Ignacio María Yepes Yepes con el propósito de llevar educación a una región marcada por la minería y el abandono estatal.</p>
+            <p>Desde entonces, nuestra institución ha sido faro de conocimiento y esperanza, formando generaciones de niños, niñas y jóvenes con un enfoque integral que combina la excelencia académica con la formación en valores. Creemos firmemente en una educación que transforma vidas, que abre puertas y que construye un mejor futuro para nuestra comunidad.</p>
+            <p>En la I.E. Ignacio Yepes Yepes trabajamos cada día por ofrecer una formación de calidad que responda a las necesidades de nuestra región, formando ciudadanos competentes, críticos y comprometidos con el desarrollo social, cultural y económico de Remedios y del Nordeste Antioqueño.</p>
           </div>
           
         </div>

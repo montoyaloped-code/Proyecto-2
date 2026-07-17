@@ -1,9 +1,6 @@
 import '../App.css';
-import { useState } from 'react';
 
 export default function HimnoSection() {
-  const [isPlaying, setIsPlaying] = useState(false);
-
   const himnos = [
     {
       label: 'Coro',
@@ -19,21 +16,14 @@ export default function HimnoSection() {
     }
   ];
 
-  const playAudio = () => {
-    setIsPlaying(!isPlaying);
-  };
-
   return (
     <section className="section-padding himno-section">
       <div className="container himno-content">
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <h2 style={{ fontSize: 'clamp(1.8rem,4vw,3rem)', marginBottom: '1rem', color: 'var(--primary-fg)' }}>Himno Institucional</h2>
           <div className="divider" style={{ background: 'var(--accent)' }}></div>
-          
           <div
-            onClick={playAudio}
             style={{
-              position: 'relative',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -41,57 +31,12 @@ export default function HimnoSection() {
               height: '120px',
               borderRadius: '1rem',
               background: 'var(--primary)',
-              cursor: 'pointer',
               marginBottom: '1rem',
-              transition: 'all 0.3s ease',
-              fontSize: '4rem'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'var(--muted-fg)';
-              e.currentTarget.style.color = 'var(--primary-fg)';
-              e.currentTarget.style.transform = 'scale(1.05)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'var(--primary)';
-              e.currentTarget.style.color = 'inherit';
-              e.currentTarget.style.transform = 'scale(1)';
+              fontSize: '3.5rem',
+              userSelect: 'none'
             }}
           >
-            <div style={{ fontSize: '3.5rem' }}>🎵</div>
-            <button
-              onClick={playAudio}
-              aria-label={isPlaying ? 'Pausar himno' : 'Reproducir himno'}
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: '2.5rem',
-                height: '2.5rem',
-                borderRadius: '50%',
-                border: 'none',
-                backgroundColor: 'var(--primary)',
-                color: 'var(--primary-fg)',
-                fontSize: '1.2rem',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                opacity: 0,
-                transition: 'opacity 0.3s ease',
-                boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
-                zIndex: 10
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.opacity = '1';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.opacity = '0';
-              }}
-              className="play-button-himno"
-            >
-              {isPlaying ? '⏸' : '▶'}
-            </button>
+            🎵
           </div>
         </div>
         

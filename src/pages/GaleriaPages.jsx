@@ -49,7 +49,7 @@ export default function GaleriaPages() {
           {galleryImages.map((image) => (
             <div
               key={image.id || image.thumb}
-              className={`gallery-item ${image.large ? 'large' : ''}`}
+              className="gallery-item"
               onClick={() => setFotoActiva(image.full)}
               style={{ cursor: 'pointer' }}
             >

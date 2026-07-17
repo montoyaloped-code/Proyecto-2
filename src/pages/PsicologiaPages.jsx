@@ -5,6 +5,15 @@ import '../App.css';
 export default function PsicologiaPages() {
   useEffect(() => { document.title = 'Bienestar Estudiantil | I.E. Ignacio Yepes Yepes'; }, []);
   const [activeCard, setActiveCard] = useState(null);
+  const [psicPhone, setPsicPhone] = useState('573113089234');
+
+  useEffect(() => {
+    const fetchConfig = async () => {
+      const { data } = await supabase.from('config_psicologia').select('phone').limit(1).maybeSingle();
+      if (data && data.phone) setPsicPhone(data.phone);
+    };
+    fetchConfig();
+  }, []);
 
   const TEMAS_ESTATICOS = [
     {
@@ -117,7 +126,7 @@ export default function PsicologiaPages() {
           La psicóloga orientadora de la institución está disponible para escucharte y brindarte un espacio 100% confidencial y seguro.
         </p>
         <a 
-          href="https://wa.me/573113089234" 
+          href={`https://wa.me/${psicPhone}`}
           target="_blank" 
           rel="noopener noreferrer" 
           className="btn"
